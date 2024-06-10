@@ -105,7 +105,7 @@ function* updatePatient({ patient }) {
         type: types.UPDATE_PATIENT_REQUEST_SUCCESS,
       });
       yield put({ type: types.GET_ALL_PATIENT });
-      window.history.back();
+    //  window.history.back();
     } else {
       yield put({
         type: types.UPDATE_PATIENT_REQUEST_FAILED,

@@ -7,8 +7,6 @@ import {
   Box,
   Button,
   FormControl,
-
-  FormHelperText,
   FormLabel,
   Grid,
   GridItem,
@@ -87,6 +85,8 @@ function ChangePasswordComponent({ entityType = "user", entity, handler, verific
 
   }
 
+
+
   const handleChangePass = () => {
 
     if (verifyPass() && verificator()) {
@@ -102,6 +102,10 @@ function ChangePasswordComponent({ entityType = "user", entity, handler, verific
       [event]: payload.target.value,
     });
   };
+
+
+  
+
 
   return (
     <form onSubmit={(e) => {
@@ -207,23 +211,27 @@ function ChangePasswordComponent({ entityType = "user", entity, handler, verific
                     type={showPw.confirmNew ? 'text' : 'password'}
                   />
                 </InputGroup>
-                {error.onConfirmPass === true && <FormHelperText color='red'>les mots de passe ne correspondent pas, le mot de passe et la confirmation doivent correspondre</FormHelperText>}
+                {error.onConfirmPass === true && (
+              <Alert status='error' mt={2} textAlign='center'>
+                <AlertIcon />
+                Les mots de passe ne correspondent pas
+              </Alert>
+            )}
 
               </FormControl>
 
 
             </Box>
-            <Box width="100%" display='flex' flexDirection='row-reverse' gap={2}>
+           <Box width="100%" display='flex' flexDirection='row-reverse' gap={2}>
 
             <Button
 
-                isLoading={processLoading}
-                onClick={processSuccess ? onCancel : ()=> console.log("nada")}
+                isLoading={processLoading || processSuccess}
                 w="full"
-                colorScheme={processSuccess? "red": "blue"}
-                type={processSuccess? "button": "submit"}
+                colorScheme="blue"
+                type='submit' 
               >
-               {processSuccess? "Retour": "Modifier"}
+               Modifier
               </Button>
               
              
