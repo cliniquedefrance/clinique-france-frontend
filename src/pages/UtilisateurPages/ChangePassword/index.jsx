@@ -42,6 +42,11 @@ function ChangePasswordUser() {
    
     const user = { ...userToUpdate,password}
       dispatch(updateUser(user))
+
+      setTimeout(() => {
+        dispatch({type:UPDATE_USER_FINISHED})
+        navigate(-1)
+      }, 2000)
     
     
   }
