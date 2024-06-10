@@ -18,7 +18,10 @@ function ChangePasswordPraticien() {
    
     const user = { ...pratToUpdate, password }
       dispatch(updatePraticien(user))
-    
+      setTimeout(() => {
+        dispatch({type:UPDATE_PRATICIEN_FINISHED})
+        navigate(-1)
+      }, 2000)
     
   }
 
