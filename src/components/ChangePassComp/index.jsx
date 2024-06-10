@@ -57,7 +57,8 @@ function ChangePasswordComponent({ entityType = "user", entity, handler, verific
   const updatingPatient = useSelector((state) => state.Patient.UpdatingPatient)
   const errorUpdatingPatient = useSelector((state) => state.Patient.errorUpdatingPatient)
   const updatePatientCompleted = useSelector((state) => state.Patient.updatePatientCompleted);
- // let entityText = ""
+  // let entityText = ""
+  
   const processLoading = updatingUser || UpdatingPraticien || updatingPatient
   const processCompleted = updateUserCompleted || updatePraticienCompleted || updatePatientCompleted
   const processError = errorUpdatingUser || errorUpdatingPraticien || errorUpdatingPatient
