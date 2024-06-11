@@ -171,7 +171,7 @@ function NavigationBar() {
         </Link>
      
        
-          <div style={{position:'fixed', marginTop:30}} ><Text style={styles.dateText}>
+          <div ><Text style={styles.dateText}>
             {getDateAndTime()} | {formatTime(time)}</Text>
           </div>
         
