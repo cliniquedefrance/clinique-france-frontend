@@ -13,22 +13,36 @@ function ChangePasswordPraticien() {
   const { id } = useParams();
   const [pratToUpdate, setPratToUpdate] = useState({});
   const praticiens = useSelector((state) => state.Praticiens.praticiens);
+  const updatingPraticien = useSelector((state) => state.Praticiens.UpdatingPraticien)
+  const errorUpdatingPraticien = useSelector((state) => state.Praticiens.errorUpdatingPraticien)
+  const updatePraticienCompleted = useSelector((state) => state.Praticiens.updatePraticienCompleted);
+const [success, setSuccess] = useState(false)
   const navigate = useNavigate()
+
   const handleChangePass = async (password) => {
    
-    const user = { ...pratToUpdate, password }
-      dispatch(updatePraticien(user))
-      setTimeout(() => {
-        dispatch({type:UPDATE_PRATICIEN_FINISHED})
-        navigate(-1)
-      }, 2000)
+    const praticien = { ...pratToUpdate, password }
+      dispatch(updatePraticien(praticien))
     
   }
 
   const [launchPrat, setLaunchPrat] = useState(true);
   
- 
-  
+
+
+  useEffect(() => {
+
+    const processSuccess = !updatingPraticien && !errorUpdatingPraticien && updatePraticienCompleted;
+    if (processSuccess) {
+      setSuccess(true)
+      setTimeout(() => {
+        dispatch({type: UPDATE_PRATICIEN_FINISHED})
+        navigate(-1)
+      },2000)
+      
+    }
+    
+  },[updatingPraticien,errorUpdatingPraticien, updatePraticienCompleted])
 
   useEffect(() => {
     if(praticiens.length === 0) dispatch(getAllPraticiens());
@@ -56,6 +70,8 @@ function ChangePasswordPraticien() {
         dispatch({type: UPDATE_PRATICIEN_FINISHED})
         navigate(-1)
       }}
+        success={success}
+      
      
     />
   );

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import moment from 'moment';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Grid, GridItem } from '@chakra-ui/react';
 import { useDispatch, useSelector } from 'react-redux';
 import FormGenerator from '../../../layouts/FormGenerator';
@@ -8,6 +8,7 @@ import { patientCreateOrEdite } from '../../../utils/data';
 import getAllCivilities from '../../../redux/civility/actions';
 import { getAllSpecialities } from '../../../redux/speciality/actions';
 import {  getAllPatients, postPatient, updatePatient } from '../../../redux/patient/actions';
+import { UPDATE_PATIENT_FINISHED } from '../../../redux/patient/types';
 
 const patientAPIformatter = (data) => ({
   civility: data?.civility?._id,
@@ -26,10 +27,31 @@ function CreatePatient() {
   const dispatch = useDispatch();
   const { id } = useParams();
   const patients = useSelector((state) => state.Patient.patients);
+  const updatingPatient = useSelector((state) => state.Patient.UpdatingPatient)
+  const errorUpdatingPatient = useSelector((state) => state.Patient.errorUpdatingPatient)
+  const updatePatientCompleted = useSelector((state) => state.Patient.updatePatientCompleted);
+const [success, setSuccess] = useState(false)
+  
   const [launchPatients, setLaunchPatients] = useState(true);
   const [patientToUpdate, setPatientToUpdate] = useState({});
   const [data] = useState(patientCreateOrEdite);
 
+  const navigate = useNavigate()
+
+  useEffect(() => {
+
+    const processSuccess = !updatingPatient && !errorUpdatingPatient && updatePatientCompleted;
+    if (processSuccess) {
+      setSuccess(true)
+      setTimeout(() => {
+        dispatch({type: UPDATE_PATIENT_FINISHED})
+        navigate(-1)
+      },2000)
+     
+
+    }
+    
+  },[updatingPatient,errorUpdatingPatient, updatePatientCompleted])
 
   useEffect(() => {
     if(patients.length === 0) dispatch(getAllPatients())
@@ -72,6 +94,8 @@ function CreatePatient() {
           data={data}
           onEdit={onEdit()}
           entity='patient'
+          success={success}
+          successMessage='Patient modifier avec succès'
         />
       </GridItem>
     </Grid>

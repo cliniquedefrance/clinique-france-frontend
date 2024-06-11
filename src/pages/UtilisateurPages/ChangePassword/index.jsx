@@ -12,11 +12,31 @@ function ChangePasswordUser() {
   const dispatch = useDispatch();
   const { id } = useParams();
   const users = useSelector((state) => state.User.users);
+
+  const updatingUser = useSelector((state) => state.User.updatingUser)
+  const errorUpdatingUser = useSelector((state) => state.User.errorUpdatingUser)
+  const updateUserCompleted = useSelector((state) => state.User.updateUserCompleted);
+const [success, setSuccess] = useState(false)
+
   const [userToUpdate, setUserToUpdate] = useState({});
 
   const [launchUser, setLaunchUser] = useState(true);
  
   const navigate = useNavigate()
+
+  useEffect(() => {
+
+    const processSuccess = !updatingUser && !errorUpdatingUser && updateUserCompleted;
+    if (processSuccess) {
+      setSuccess(true)
+      setTimeout(() => {
+        dispatch({type: UPDATE_USER_FINISHED})
+        navigate(-1)
+      },2000)
+      
+    }
+    
+  },[updatingUser,errorUpdatingUser, updateUserCompleted])
 
   
   useEffect(() => {
@@ -42,12 +62,6 @@ function ChangePasswordUser() {
    
     const user = { ...userToUpdate,password}
       dispatch(updateUser(user))
-
-      setTimeout(() => {
-        dispatch({type:UPDATE_USER_FINISHED})
-        navigate(-1)
-      }, 2000)
-    
     
   }
 
@@ -64,6 +78,7 @@ function ChangePasswordUser() {
         dispatch({type:UPDATE_USER_FINISHED})
         navigate(-1)
       }}
+      success={success}
      
     />
   );

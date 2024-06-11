@@ -16,9 +16,30 @@ function ChangePasswordPatient() {
   const patients = useSelector((state) => state.Patient.patients);
   const [patientToUpdate, setPatientToUpdate] = useState({});
 
+
+  const updatingPatient = useSelector((state) => state.Patient.UpdatingPatient)
+  const errorUpdatingPatient = useSelector((state) => state.Patient.errorUpdatingPatient)
+  const updatePatientCompleted = useSelector((state) => state.Patient.updatePatientCompleted);
+const [success, setSuccess] = useState(false)
+  
   const [launchPatient, setLaunchPatient] = useState(true);
  
   const navigate = useNavigate()
+
+  useEffect(() => {
+
+    const processSuccess = !updatingPatient && !errorUpdatingPatient && updatePatientCompleted;
+    if (processSuccess) {
+      setSuccess(true)
+      setTimeout(() => {
+        dispatch({type: UPDATE_PATIENT_FINISHED})
+        navigate(-1)
+      },2000)
+     
+
+    }
+    
+  },[updatingPatient,errorUpdatingPatient, updatePatientCompleted])
 
   useEffect(() => {
     dispatch({ type: UPDATE_PATIENT_FINISHED })
@@ -42,19 +63,13 @@ function ChangePasswordPatient() {
   }
 
   
-
-
+  
  
 
   const handleChangePass = (password) => {
    
     const patient = { ...patientToUpdate,password}
     dispatch(updatePatient(patient))
-    
-    setTimeout(() => {
-      dispatch({type:UPDATE_PATIENT_FINISHED})
-      navigate(-1)
-    }, 2000)
     
     
   }
@@ -72,7 +87,8 @@ function ChangePasswordPatient() {
         dispatch({type:UPDATE_PATIENT_FINISHED})
         navigate(-1)
       }}
-     
+      success={success}
+      
     />
   );
 }

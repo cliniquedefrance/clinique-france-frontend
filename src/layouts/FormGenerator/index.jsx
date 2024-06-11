@@ -52,7 +52,9 @@ function FormGenerator({
   cle,
   handlePost = null,
   entity = '',
-  onEdit = false
+  onEdit = false,
+  success = false,
+  successMessage = "Mise à jour réussit"
   // handleClearSearchForm = undefined,?
 }) {
 
@@ -772,8 +774,8 @@ function FormGenerator({
                         placeholder='numéro de téléphone'
                         inputProps={{
                           name: e?.name,
-                          maxlength: 16,
-                          minlength: 16,
+                          maxLength: 16,
+                          minLength: 16,
                           required:true,
                         }}
                       />) : 
@@ -940,6 +942,12 @@ function FormGenerator({
           }
           return result;
         })}
+        {
+          success && <Alert status='success' mt={5} mb={5} ml={100}  w='auto'>
+            <AlertIcon/>
+            {successMessage}
+          </Alert>
+        }
         <p style={{ color: 'red', marginLeft: '200px', marginBottom: '10px' }}>
           {(canShowPhoneNumberFieldError ||
             phoneisEmpty.show ||

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import moment from 'moment';
 import { Grid, GridItem } from '@chakra-ui/react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -12,6 +12,7 @@ import {
   postPraticien,
   updatePraticien,
 } from '../../../redux/praticiens/actions';
+import { UPDATE_PRATICIEN_FINISHED } from '../../../redux/praticiens/types';
 
 const pratAPIformatter = (data) => ({
   civility: data.civility,
@@ -34,9 +35,31 @@ function CreatePraticien() {
   const dispatch = useDispatch();
   const { id } = useParams();
   const praticiens = useSelector((state) => state.Praticiens.praticiens);
+  const updatingPraticien = useSelector((state) => state.Praticiens.UpdatingPraticien)
+  const errorUpdatingPraticien = useSelector((state) => state.Praticiens.errorUpdatingPraticien)
+  const updatePraticienCompleted = useSelector((state) => state.Praticiens.updatePraticienCompleted);
+const [success, setSuccess] = useState(false)
+
   const [launchPrat, setLaunchPrat] = useState(true);
   const [pratToUpdate, setPratToUpdate] = useState({});
   const [data] = useState(praticienCreateOrEdite);
+
+
+  const navigate = useNavigate()
+
+  useEffect(() => {
+
+    const processSuccess = !updatingPraticien && !errorUpdatingPraticien && updatePraticienCompleted;
+    if (processSuccess) {
+      setSuccess(true)
+      setTimeout(() => {
+        dispatch({type: UPDATE_PRATICIEN_FINISHED})
+        navigate(-1)
+      },2000)
+      
+    }
+    
+  },[updatingPraticien,errorUpdatingPraticien, updatePraticienCompleted])
   
 
   useEffect(() => {
@@ -49,7 +72,7 @@ function CreatePraticien() {
     });
     dispatch(getAllCivilities());
     dispatch(getAllSpecialities());
-  }, [praticiens]);
+  }, []);
 
   if (id && launchPrat) {
     return 'launching praticiens';
@@ -58,7 +81,7 @@ function CreatePraticien() {
   const handlePost = (praticien) => {
     if (id) {
       dispatch(updatePraticien(praticien));
-      window.history.back();
+     // window.history.back();
     } else {
       dispatch(postPraticien(praticien));
     }
@@ -80,6 +103,8 @@ function CreatePraticien() {
           data={data}
           entity='praticien'
           onEdit={onEdit()}
+          success={success}
+          successMessage='Praticien modifier avec succès'
         />
       </GridItem>
     </Grid>

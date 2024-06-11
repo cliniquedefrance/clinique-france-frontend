@@ -38,7 +38,7 @@ import hide from '../../assets/images/hide.png';
  * @param {errorMessage} Props.errorMessage un message d'erreur?
  * @returns 
  */
-function ChangePasswordComponent({ entityType = "user", entity, handler, verificator = () => true, onCancel, changeError = false, errorMessage = '' }) {
+function ChangePasswordComponent({ entityType = "user", entity, handler, verificator = () => true, onCancel, changeError = false, errorMessage = '', success = false, successMsg='Mot de passe modifier avec succes' }) {
   const [error, setError] = useState({ onConfirmPass: false, onOther: changeError });
   const [formData, setFormData] = useState({
     oldPass: '',
@@ -62,8 +62,8 @@ function ChangePasswordComponent({ entityType = "user", entity, handler, verific
   const processLoading = updatingUser || UpdatingPraticien || updatingPatient
   const processCompleted = updateUserCompleted || updatePraticienCompleted || updatePatientCompleted
   const processError = errorUpdatingUser || errorUpdatingPraticien || errorUpdatingPatient
-  const processSuccess = processCompleted && !processLoading && processError == null
-  const successMsg = 'Mot de passe modifié avec success'
+
+ 
 
   console.log("password Change", entityType)
   console.log("entity", entity.name || entity.surname)
@@ -149,7 +149,7 @@ function ChangePasswordComponent({ entityType = "user", entity, handler, verific
                 {errorMessage || processError}
               </Alert>
             )}
-            {processCompleted && processSuccess && (
+            {success && (
               <Alert status='success' mt={2}>
                 <AlertIcon />
                 {successMsg}
@@ -227,7 +227,7 @@ function ChangePasswordComponent({ entityType = "user", entity, handler, verific
 
             <Button
 
-                isLoading={processLoading || processSuccess}
+                isLoading={processLoading}
                 w="full"
                 colorScheme="blue"
                 type='submit' 
