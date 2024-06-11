@@ -158,7 +158,7 @@ function NavigationBar() {
       flexDirection={{ base: 'column', md: 'row' }}
       alignItems="center"
     >
-      <div style={{display:'flex', flexDirection:'column', alignItems:"center", justifyContent:'center'}}>
+      <div style={{display:'flex', flexDirection:'column', alignItems:"center", flex:1, justifyContent:'center'}}>
          <VStack justifyItems="center" style={{ position: 'fixed', marginTop: -18, marginLeft: 30 }}>
         <Link to="/content" style={{ borderColor: 'red' }}>
             <Text
