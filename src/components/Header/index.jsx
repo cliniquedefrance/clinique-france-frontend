@@ -158,7 +158,7 @@ function NavigationBar() {
       flexDirection={{ base: 'column', md: 'row' }}
       alignItems="center"
     >
-      <div style={{display:'flex', flexDirection:'column', alignItems:"center", flex:1, justifyContent:'center'}}>
+   
          <VStack justifyItems="center" style={{ position: 'fixed', marginTop: -18, marginLeft: 30 }}>
         <Link to="/content" style={{ borderColor: 'red' }}>
             <Text
@@ -169,12 +169,12 @@ function NavigationBar() {
             </Text>
           </Link>
       </VStack>
-      <VStack justifyItems="center" style={{ position: 'fixed', marginTop: 29 }}>
+      <VStack justifyItems="center" style={{ position: 'fixed', marginTop: 29, marginLeft:5 }}>
        
         <div style={{ postion: 'fixed', marginLeft: 12 }}><Text style={styles.dateText}>{getDateAndTime()} | {  formatTime(time)}</Text></div>
         
       </VStack>
-      </div>
+    
      
       <div>
       {windowWidth > 758 ? (

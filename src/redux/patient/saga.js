@@ -84,6 +84,8 @@ function* postPatient({ patient }) {
 }
 
 function* updatePatient({ patient }) {
+
+  console.log("updating patient", patient)
   const payload = {
     civility: patient?.civility,
     name: patient.name,
