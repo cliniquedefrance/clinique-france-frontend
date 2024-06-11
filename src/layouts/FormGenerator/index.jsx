@@ -414,6 +414,7 @@ function FormGenerator({
 
   const pratEdit = entity === 'praticien' && onEdit === true;
   const userEdit = entity === 'user' && onEdit === true;
+  const patientEdit = entity === 'patient' && onEdit === true;
 
   return (
     <VStack spacing={5}>
@@ -575,7 +576,7 @@ function FormGenerator({
               );
               break;
             case 'password':
-              result = (pratEdit || userEdit) ? null : (
+              result = (pratEdit || userEdit || patientEdit) ? null : (
                 <FormControl
                   // isInvalid={errors[e.name]}
                   marginBottom={5}

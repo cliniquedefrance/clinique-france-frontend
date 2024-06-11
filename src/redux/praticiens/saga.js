@@ -188,7 +188,7 @@ function* updatePraticien({ praticien }) {
       yield put({
         type: types.UPDATE_PRATICIEN_FINISHED,
       });
-    //  yield put({ type: types.GET_ALL_PRATICIENS_REQUEST });
+      yield put({ type: types.GET_ALL_PRATICIENS_REQUEST });
     //  window.history.back();
     } else {
       yield put({

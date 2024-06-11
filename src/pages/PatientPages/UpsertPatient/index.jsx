@@ -47,6 +47,14 @@ function CreatePatient() {
     return 'launching patients';
   }
 
+
+  const onEdit = () => {
+    if (id) {
+      return true
+    }
+    return false
+  }
+
   const handlePost = (patient) => {
     if (id) {
       dispatch(updatePatient(patient));
@@ -62,6 +70,8 @@ function CreatePatient() {
           handlePost={handlePost}
           editeData={patientAPIformatter(patientToUpdate)}
           data={data}
+          onEdit={onEdit()}
+          entity='patient'
         />
       </GridItem>
     </Grid>
