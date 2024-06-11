@@ -159,7 +159,8 @@ function NavigationBar() {
       alignItems="center"
     >
    
-         <VStack justifyItems="center" style={{ position: 'fixed', marginTop: -18, marginLeft: 30 }}>
+      
+         <VStack justifyContent='center' alignItems='center'  style={{ position: 'fixed', marginTop: -18, marginLeft: 30 }}>
         <Link to="/content" style={{ borderColor: 'red' }}>
             <Text
               fontSize={windowWidth < 958 ? 16 : 20}
@@ -167,13 +168,15 @@ function NavigationBar() {
             >
               Clinique de France
             </Text>
-          </Link>
-      </VStack>
-      <VStack justifyItems="center" style={{ position: 'fixed', marginTop: 29, marginLeft:5 }}>
+        </Link>
+     
        
-        <div style={{ postion: 'fixed', marginLeft: 12 }}><Text style={styles.dateText}>{getDateAndTime()} | {  formatTime(time)}</Text></div>
+          <div ><Text style={styles.dateText}>
+            {getDateAndTime()} | {formatTime(time)}</Text>
+          </div>
         
       </VStack>
+     
     
      
       <div>
