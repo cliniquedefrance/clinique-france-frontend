@@ -754,7 +754,9 @@ function FormGenerator({
                               isGenerated: true,
                               value:'',
                             })
-                          setPhoneisEmpty({isEmpty:true, show: false, msg: emptyPhoneNumberMsg})
+                          if (!formik.values[e.name]) {
+                            setPhoneisEmpty({ isEmpty: true, show: false, msg: emptyPhoneNumberMsg })
+                          }
                           
                         }}
                         onChange={(...args) => {
