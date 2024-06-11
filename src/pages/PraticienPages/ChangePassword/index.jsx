@@ -16,7 +16,10 @@ function ChangePasswordPraticien() {
   const updatingPraticien = useSelector((state) => state.Praticiens.UpdatingPraticien)
   const errorUpdatingPraticien = useSelector((state) => state.Praticiens.errorUpdatingPraticien)
   const updatePraticienCompleted = useSelector((state) => state.Praticiens.updatePraticienCompleted);
-const [success, setSuccess] = useState(false)
+  const [success, setSuccess] = useState(false)
+  
+  const [showingSuccess, setShowingSuccess] = useState(false)
+
   const navigate = useNavigate()
 
   const handleChangePass = async (password) => {
@@ -35,10 +38,12 @@ const [success, setSuccess] = useState(false)
     const processSuccess = !updatingPraticien && !errorUpdatingPraticien && updatePraticienCompleted;
     if (processSuccess) {
       setSuccess(true)
+      setShowingSuccess(true)
       setTimeout(() => {
         dispatch({type: UPDATE_PRATICIEN_FINISHED})
+        setShowingSuccess(false)
         navigate(-1)
-      },2000)
+      },3000)
       
     }
     
@@ -71,7 +76,7 @@ const [success, setSuccess] = useState(false)
         navigate(-1)
       }}
         success={success}
-      
+      operationInterval={showingSuccess}
      
     />
   );

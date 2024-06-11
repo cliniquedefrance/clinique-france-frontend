@@ -30,7 +30,9 @@ function CreatePatient() {
   const updatingPatient = useSelector((state) => state.Patient.UpdatingPatient)
   const errorUpdatingPatient = useSelector((state) => state.Patient.errorUpdatingPatient)
   const updatePatientCompleted = useSelector((state) => state.Patient.updatePatientCompleted);
-const [success, setSuccess] = useState(false)
+  const [success, setSuccess] = useState(false)
+  const [showingSuccess, setShowingSuccess] = useState(false)
+
   
   const [launchPatients, setLaunchPatients] = useState(true);
   const [patientToUpdate, setPatientToUpdate] = useState({});
@@ -43,8 +45,10 @@ const [success, setSuccess] = useState(false)
     const processSuccess = !updatingPatient && !errorUpdatingPatient && updatePatientCompleted;
     if (processSuccess) {
       setSuccess(true)
+      setShowingSuccess(true)
       setTimeout(() => {
-        dispatch({type: UPDATE_PATIENT_FINISHED})
+        dispatch({ type: UPDATE_PATIENT_FINISHED })
+        setShowingSuccess(false)
         navigate(-1)
       },2000)
      
@@ -96,6 +100,7 @@ const [success, setSuccess] = useState(false)
           entity='patient'
           success={success}
           successMessage='Patient modifier avec succès'
+          operationInterval={showingSuccess}
         />
       </GridItem>
     </Grid>

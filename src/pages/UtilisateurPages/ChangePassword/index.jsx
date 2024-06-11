@@ -16,7 +16,8 @@ function ChangePasswordUser() {
   const updatingUser = useSelector((state) => state.User.updatingUser)
   const errorUpdatingUser = useSelector((state) => state.User.errorUpdatingUser)
   const updateUserCompleted = useSelector((state) => state.User.updateUserCompleted);
-const [success, setSuccess] = useState(false)
+  const [success, setSuccess] = useState(false)
+  const [showingSuccess, setShowingSuccess] = useState(false)
 
   const [userToUpdate, setUserToUpdate] = useState({});
 
@@ -29,10 +30,12 @@ const [success, setSuccess] = useState(false)
     const processSuccess = !updatingUser && !errorUpdatingUser && updateUserCompleted;
     if (processSuccess) {
       setSuccess(true)
+      setShowingSuccess(true)
       setTimeout(() => {
-        dispatch({type: UPDATE_USER_FINISHED})
+        dispatch({ type: UPDATE_USER_FINISHED })
+        setShowingSuccess(false)
         navigate(-1)
-      },2000)
+      },3000)
       
     }
     
@@ -79,6 +82,7 @@ const [success, setSuccess] = useState(false)
         navigate(-1)
       }}
       success={success}
+      operationInterval={showingSuccess}
      
     />
   );

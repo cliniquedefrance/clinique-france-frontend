@@ -38,7 +38,9 @@ function CreatePraticien() {
   const updatingPraticien = useSelector((state) => state.Praticiens.UpdatingPraticien)
   const errorUpdatingPraticien = useSelector((state) => state.Praticiens.errorUpdatingPraticien)
   const updatePraticienCompleted = useSelector((state) => state.Praticiens.updatePraticienCompleted);
-const [success, setSuccess] = useState(false)
+  const [success, setSuccess] = useState(false)
+  const [showingSuccess, setShowingSuccess] = useState(false)
+
 
   const [launchPrat, setLaunchPrat] = useState(true);
   const [pratToUpdate, setPratToUpdate] = useState({});
@@ -52,8 +54,10 @@ const [success, setSuccess] = useState(false)
     const processSuccess = !updatingPraticien && !errorUpdatingPraticien && updatePraticienCompleted;
     if (processSuccess) {
       setSuccess(true)
+      setShowingSuccess(true)
       setTimeout(() => {
-        dispatch({type: UPDATE_PRATICIEN_FINISHED})
+        dispatch({ type: UPDATE_PRATICIEN_FINISHED })
+        setShowingSuccess(false)
         navigate(-1)
       },2000)
       
@@ -105,6 +109,7 @@ const [success, setSuccess] = useState(false)
           onEdit={onEdit()}
           success={success}
           successMessage='Praticien modifier avec succès'
+          operationInterval={showingSuccess}
         />
       </GridItem>
     </Grid>

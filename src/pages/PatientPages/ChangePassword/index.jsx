@@ -21,7 +21,8 @@ function ChangePasswordPatient() {
   const errorUpdatingPatient = useSelector((state) => state.Patient.errorUpdatingPatient)
   const updatePatientCompleted = useSelector((state) => state.Patient.updatePatientCompleted);
 const [success, setSuccess] = useState(false)
-  
+const [showingSuccess, setShowingSuccess] = useState(false)
+
   const [launchPatient, setLaunchPatient] = useState(true);
  
   const navigate = useNavigate()
@@ -31,10 +32,12 @@ const [success, setSuccess] = useState(false)
     const processSuccess = !updatingPatient && !errorUpdatingPatient && updatePatientCompleted;
     if (processSuccess) {
       setSuccess(true)
+      setShowingSuccess(true)
       setTimeout(() => {
-        dispatch({type: UPDATE_PATIENT_FINISHED})
+        dispatch({ type: UPDATE_PATIENT_FINISHED })
+        setShowingSuccess(false)
         navigate(-1)
-      },2000)
+      },3000)
      
 
     }
@@ -88,7 +91,7 @@ const [success, setSuccess] = useState(false)
         navigate(-1)
       }}
       success={success}
-      
+      operationInterval={showingSuccess}
     />
   );
 }

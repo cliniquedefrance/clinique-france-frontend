@@ -54,7 +54,8 @@ function FormGenerator({
   entity = '',
   onEdit = false,
   success = false,
-  successMessage = "Mise à jour réussit"
+  successMessage = "Mise à jour réussit",
+  operationInterval = false
   // handleClearSearchForm = undefined,?
 }) {
 
@@ -755,8 +756,15 @@ function FormGenerator({
                               value:'',
                             })
                           if (!formik.values[e.name]) {
+                            console.log(formik.values[e.name])
                             setPhoneisEmpty({ isEmpty: true, show: false, msg: emptyPhoneNumberMsg })
+                          } else {
+                            console.log('values no empty', formik.values[e.name])
+                            setPhoneisEmpty({ isEmpty: false, show: false, msg: '' })
                           }
+                    
+                          
+                          
                           
                         }}
                         onChange={(...args) => {
@@ -1017,7 +1025,8 @@ function FormGenerator({
                   updatingLieuLoading ||
                   updatingMotif ||
                   updatingSpecialities ||
-                  searchConsigne) )||
+                    searchConsigne ||
+                  operationInterval)) ||
                 ((i === 1 && cle) &&
                  ( loadingUsers ||
                   gettingAllConsigne ||

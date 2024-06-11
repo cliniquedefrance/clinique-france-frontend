@@ -38,7 +38,7 @@ import hide from '../../assets/images/hide.png';
  * @param {errorMessage} Props.errorMessage un message d'erreur?
  * @returns 
  */
-function ChangePasswordComponent({ entityType = "user", entity, handler, verificator = () => true, onCancel, changeError = false, errorMessage = '', success = false, successMsg='Mot de passe modifier avec succes' }) {
+function ChangePasswordComponent({ entityType = "user", entity, handler, verificator = () => true, onCancel, changeError = false, errorMessage = '', success = false, successMsg='Mot de passe modifier avec succes', operationInterval=false }) {
   const [error, setError] = useState({ onConfirmPass: false, onOther: changeError });
   const [formData, setFormData] = useState({
     oldPass: '',
@@ -227,7 +227,7 @@ function ChangePasswordComponent({ entityType = "user", entity, handler, verific
 
             <Button
 
-                isLoading={processLoading}
+                isLoading={processLoading || operationInterval}
                 w="full"
                 colorScheme="blue"
                 type='submit' 
