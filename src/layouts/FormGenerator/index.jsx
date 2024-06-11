@@ -743,6 +743,7 @@ function FormGenerator({
                     {e.name === 'telephone' ?
                       
                       (<PhoneInput
+                        value={formik.values[e.name]}
                         countryCodeEditable={false}
                         onMount={() => {
                          console.log('phone nmber field gen: ', phoneError.isGenerated)
