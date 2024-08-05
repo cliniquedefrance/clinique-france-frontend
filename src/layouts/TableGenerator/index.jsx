@@ -103,6 +103,12 @@ function TableGenerator({
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+ 
+  useEffect(()=>{
+     if (currentPage > totalPages ) {
+    setCurrentPage(1)
+  }
+  },[dataBodyRow])
   const currentItems = dataBodyRow.slice(indexOfFirstItem, indexOfLastItem);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
