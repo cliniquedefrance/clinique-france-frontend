@@ -162,6 +162,11 @@ export const dataPatient = {
       label: 'supprimer',
       action: (fn) => fn(),
     },
+    {
+      label: 'Gérer le patient',
+      action: () => console.log('manage patient') ,
+      editePath: '/content/patient/manage/',
+    },
     
   ],
 };
