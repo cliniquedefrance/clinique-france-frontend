@@ -170,3 +170,38 @@ export const formatDataForConsignePicKlist = data => data?.map((c) =>({
 export const delay = time => new Promise(resolve => {setTimeout(resolve, time)});
 
 export const validateEmail = (email) => String(email).trim().toLowerCase().match(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/);
+
+
+export const renderObjectWithoutField = (object, field=[]) => {
+  const actualObjectKeys = Object.keys(object);
+  const newObject = {};
+  const filteredObjectKeys = actualObjectKeys.filter((key) => {
+    if (field.includes(key)) {
+      return false;
+    }
+      return true;
+    
+  })
+
+  filteredObjectKeys.forEach((key) =>{
+    newObject[key] = object[key]
+  })
+
+  return newObject;
+  
+}
+
+
+export function calculerAge(dateNaissance) {
+  // Créer des objets Date pour la date de naissance et la date d'aujourd'hui
+  const naissance = new Date(dateNaissance);
+  const aujourdhui = new Date();
+
+  // Calculer la différence en millisecondes
+  const difference = aujourdhui - naissance;
+
+  // Convertir en années en divisant par le nombre de millisecondes dans une année
+  const ageEnAnnees = Math.floor(difference / (1000 * 60 * 60 * 24 * 365.25));
+
+  return ageEnAnnees;
+}
