@@ -120,7 +120,7 @@ function Ophtamology({ with: initialData, onSave, isOpen, loading, onClose, pati
        onClose();
         clearTimeout(test)
 
-      },10000)
+      },2000)
     }
   }, [success])
 
