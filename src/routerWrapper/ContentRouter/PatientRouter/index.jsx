@@ -5,6 +5,7 @@ import CreatePatient from '../../../pages/PatientPages/UpsertPatient';
 import ChangePasswordPatient from '../../../pages/PatientPages/ChangePassword';
 import ManagePatient from '../../../pages/PatientPages/Manage';
 
+
 function PatientRouter() {
   return (
     <Routes>
@@ -12,7 +13,9 @@ function PatientRouter() {
       <Route path="/upsert/:id?" element={<CreatePatient />} />
       <Route path="/change-pwd/:id?" element={<ChangePasswordPatient />} />
       <Route path="/manage/:id?" element={<ManagePatient />} />
-    </Routes>
+      </Routes>
+ 
+    
   );
 }
 

@@ -22,7 +22,7 @@ import Ophtamology from '../../../components/Ordonances/Ophtamology';
 import { createOrdonnance, deleteOrdonnance, getOrdonnancesByPatient, updateOrdonnance } from './ordonnance.api';
 import OrdonnanceOphtaCard from '../../../components/Ordonances/OrdonnaceOphtaCard';
 import DeleteRessourceDialogue from '../../../components/Ressource/DeleteRessource';
-import { CREATE_MODE, ORDONNANCE_RESSOURCE, UPDATE_MODE, VIEW_MODE } from './constants';
+import { CREATE_MODE, ORDONNANCE_OPHTA_TO_PRINT, ORDONNANCE_RESSOURCE, UPDATE_MODE, VIEW_MODE } from './constants';
 
 
 function ManagePatient() {
@@ -71,7 +71,13 @@ function ManagePatient() {
     }
   };
 
-  const onPrint = () => {
+  const onPrint = (data) => {
+    const ordoData = {
+      ...data,
+      patient:patientToManage,
+    }
+    window.localStorage.setItem(ORDONNANCE_OPHTA_TO_PRINT, JSON.stringify(ordoData));
+    navigate(`/print/ordonnance-ophta/${data._id}`)
     console.log("Ordonnance imprimée !");
   };
 
@@ -84,7 +90,7 @@ function ManagePatient() {
         loading:true,
       }))
     try {
-      await createOrdonnance({...data, patient:patientToManage._id});
+     const ord = await createOrdonnance({...data, patient:patientToManage._id});
       setModalOrdoState(prev => ({
         ...prev,
         error:"",
@@ -92,8 +98,10 @@ function ManagePatient() {
         success: "Ordonnance créée avec succès."
       }))
       if (print) {
-        onPrint();
+        onPrint(ord);
       }
+      return true;
+
     } catch (error) {
       setModalOrdoState(prev => ({
         ...prev,
@@ -101,6 +109,7 @@ function ManagePatient() {
         loading:false,
         success: ""
       }))
+      return false;
     } finally {
       handleFetchAllOrdonnances();
     }
@@ -196,23 +205,24 @@ function ManagePatient() {
     }))
     try {
       await updateOrdonnance(selectedOrdonnance._id, ordonnance);
-      if (print) {
-        onPrint();
-      }
-      setModalOrdoState(prev => ({
-        ...prev,
-        error:"",
-        loading:false,
-        success: "Mise à jour réussie."
-      }))
-      return true
-    } catch (error) {
      
       setModalOrdoState(prev => ({
         ...prev,
         error:"",
         loading:false,
-        success: "Erreur lors de la mise à jour."
+        success: `Mise à jour réussie. ${print? "impression...":""}`
+      }))
+      if (print) {
+        onPrint(ordonnance);
+      }
+      return true
+    } catch (error) {
+     
+      setModalOrdoState(prev => ({
+        ...prev,
+        error:"Erreur lors de la mise à jour.",
+        loading:false,
+        success: ""
       }))
 
       return false
@@ -331,12 +341,12 @@ function ManagePatient() {
                   loading={modalOrdoState.loading}
                   with={selectedOrdonnance}
                   mode={modalMode}
-                  onUpdate={(data) => onUpdate(data, true)}
+                  onUpdate={onUpdate}
                   onPrint={onPrint}
                   patient={patientToManage}
                   onClose={hideModal}
                   isOpen={isViewModalOpen}
-                  onSave={(data) => onCreateOrdonnance(data, true)}
+                  onSave={onCreateOrdonnance}
                   error={modalOrdoState.error}
                   success={modalOrdoState.success}
                 />

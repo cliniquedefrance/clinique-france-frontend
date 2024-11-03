@@ -53,7 +53,8 @@ function Ophtamology({ with: initialData, onSave, isOpen, loading, onClose, pati
 
   const [formData, setFormData] = useState(initialFormData);
   const [retry, setRetry] = useState(false); // Pour gérer l'état de réessai
-  const [inactive, setInactive] = useState(false)
+  const [inactive, setInactive] = useState(false);
+  const [printAfter, setPrintAfter] = useState(false)
 
   useEffect(() => {
     if (retry && (error || success)) {
@@ -86,26 +87,26 @@ function Ophtamology({ with: initialData, onSave, isOpen, loading, onClose, pati
 
   const handleSave = async (e, printAfterSave = false) => {
     e.preventDefault();
+    setPrintAfter(printAfterSave);
     if (onSave) {
-      const success = await onSave(formData);
-      if (success && printAfterSave) handlePrint();
+      await onSave(formData, printAfterSave);
     }
   };
 
   const handleUpdate = async (e, printAfterUpdate = false) => {
     e.preventDefault();
+    setPrintAfter(printAfterUpdate)
     setInactive(true)
     if (onUpdate) {
-      const success = await onUpdate(formData);
-      if (success && printAfterUpdate) handlePrint();
+       await onUpdate(formData, printAfterUpdate);
     }
    // onClose();
   };
 
   const handleRetry = () => {
     setRetry(true);
-    if (mode === CREATE_MODE) handleSave(new Event('submit'));
-    if (mode === UPDATE_MODE) handleUpdate(new Event('submit'));
+    if (mode === CREATE_MODE) handleSave(new Event('submit'), printAfter);
+    if (mode === UPDATE_MODE) handleUpdate(new Event('submit'), printAfter);
   };
 
   const handleModalClose = () => {

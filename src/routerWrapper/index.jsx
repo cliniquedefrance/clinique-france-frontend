@@ -4,6 +4,7 @@ import { useSelector} from 'react-redux';
 import ContentRouter from './ContentRouter';
 import AuthRouter from './AuthRouter';
 import AppointmentPDF from '../components/pdf/appointment-pdf';
+import OrdonnanceOphtaPDF from '../pages/PatientPages/Manage/ordonnance-ophta-pdf';
 
 
 
@@ -37,6 +38,7 @@ function Routeur() {
         <Route path="/" element={<AuthRouter />} />
         <Route path="/content/*" element={ <ContentRouter />} />
         <Route path="/print-pdf" element={<AppointmentPDF />} />
+        <Route path="/print/ordonnance-ophta/:id?" element={<OrdonnanceOphtaPDF />} />
       </Routes>
     </BrowserRouter>
   );
