@@ -29,11 +29,11 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: 'row',
-    borderBottom: '1px solid #000',
+    borderBottom: '0.5px solid #000',
   },
   cell: {
     flex: 1,
-    border: '1px solid #000',
+    border: '0.5px solid #000',
     padding: 3,
     textAlign: 'center',
   },
@@ -99,9 +99,13 @@ function OrdonnanceOphtaPDF() {
         <Page style={styles.page} orientation="landscape">
           {/* En-tête */}
           <View style={styles.header}>
-            <Image style={styles.image} src="/favicon.png" />
+            <View style={{flexDirection:"row", gap:2, alignItems:'center'}}>
+              <Image style={styles.image} src="/favicon.png" />
+              <Text style={{fontSize:"24px", fontWeight:"bold"}}>Clinique France</Text>
+            </View>
+            
             <View>
-              <Text>Clinique France</Text>
+              
               <Text>Poste Central, Yaoundé</Text>
               <Text>BP 1000 Yaoundé-Cameroun - Tel 679 77 04 64 - 695 85 27 12</Text>
             </View>
@@ -127,40 +131,51 @@ function OrdonnanceOphtaPDF() {
             <Text style={styles.cell}>Droit</Text>
             <Text style={styles.cell}>{ordonnance?.oeilDroit?.SPH}</Text>
             <Text style={styles.cell}>{ordonnance?.oeilDroit?.CYL}</Text>
-            <Text style={styles.cell}>{ordonnance?.oeilDroit?.AXE}</Text>
+            <Text style={styles.cell}>{`${ordonnance?.oeilDroit?.AXE}${ordonnance?.oeilDroit?.AXE ? "°":""}`}</Text>
             <Text style={styles.cell}>{ordonnance?.oeilDroit?.ADD}</Text>
-            <Text style={styles.cell}>{ordonnance?.oeilDroit?.EP}</Text>
+            <Text style={styles.cell}>{`${ordonnance?.oeilDroit?.EP}${ordonnance?.oeilDroit?.EP?'mw':""}`}</Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.cell}>Gauche</Text>
             <Text style={styles.cell}>{ordonnance?.oeilGauche?.SPH}</Text>
             <Text style={styles.cell}>{ordonnance?.oeilGauche?.CYL}</Text>
-            <Text style={styles.cell}>{ordonnance?.oeilGauche?.AXE}</Text>
+            <Text style={styles.cell}>{`${ordonnance?.oeilGauche?.AXE}${ordonnance?.oeilGauche?.AXE ? "°":""}`}</Text>
             <Text style={styles.cell}>{ordonnance?.oeilGauche?.ADD}</Text>
-            <Text style={styles.cell}>{ordonnance?.oeilGauche?.EP}</Text>
+            <Text style={styles.cell}>{`${ordonnance?.oeilGauche?.EP}${ordonnance?.oeilGauche?.EP?'mw':""}`}</Text>
           </View>
 
           {/* Options de Traitements, Verres, et Matières */}
           <View style={[styles.section, { padding: "10px", flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" }]}>
-            <View>
+           
+           
+           {ordonnance?.traitements?.lenght !== 0 && <View>
               <Text>Traitements:</Text>
               {ordonnance?.traitements?.map((t, index) => (
                 <Text key={index} style={styles.checkbox}>{t}</Text>
               ))}
-            </View>
-            <View>
-              <Text>Verres:</Text>
-              <Text style={styles.checkbox}>{ordonnance?.verre}</Text>
-            </View>
-            <View>
+            </View>} 
+           
+
+            {ordonnance?.verre &&(<View>
+            <Text>Verres:</Text>
+            <Text style={styles.checkbox}>{ordonnance?.verre}</Text>
+           </View>)}
+              
+              
+          
+           {ordonnance?.matiere &&  <View>
               <Text>Matières:</Text>
               <Text style={styles.checkbox}>{ordonnance?.matiere}</Text>
-            </View>
-            <View>
+            </View>}
+
+            {ordonnance?.port &&  <View>
               <Text>Port:</Text>
               <Text style={styles.checkbox}>{ordonnance?.port}</Text>
             </View>
+          
+          }
           </View>
+           
 
           {/* Note */}
           <View style={styles.section}>

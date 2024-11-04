@@ -351,17 +351,21 @@ function ManagePatient() {
                   success={modalOrdoState.success}
                 />
               )}
-                 {pageOrdoState.loading ? <Spinner /> : allOrdonnances.length ? (
-                allOrdonnances.map((ordonnance) => (
-                  <OrdonnanceOphtaCard
-                    key={ordonnance._id}
-                    ordonnance={ordonnance}
-                    onView={handleViewOrdonnance}
-                    onDelete={handleDeleteOrdonnance}
-                    onUpdate={handleUpdateOrdonnance}
-                    onPrint={onPrint}
-                  />
-                ))
+                 {allOrdonnances.length ? (<>
+                        {pageOrdoState.loading && <Spinner /> }
+                          {allOrdonnances.map((ordonnance) => (
+                                            <OrdonnanceOphtaCard
+                                              key={ordonnance._id}
+                                              ordonnance={ordonnance}
+                                              onView={handleViewOrdonnance}
+                                              onDelete={handleDeleteOrdonnance}
+                                              onUpdate={handleUpdateOrdonnance}
+                                              onPrint={onPrint}
+                                            />
+                                          ))}
+                 </>
+                  
+               
               ) : <p>Aucune ordonnance trouvée pour ce patient.</p>}
               </TabPanel>
 
