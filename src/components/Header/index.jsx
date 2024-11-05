@@ -234,6 +234,9 @@ function NavigationBar() {
                   <Link to="/content">
                     <MenuItem>Parametres avancés</MenuItem>
                   </Link>
+                  <Link to="/content/catalogue">
+                    <MenuItem>Catalogue</MenuItem>
+                  </Link>
                 </MenuList>
               </Menu>
             </Box>

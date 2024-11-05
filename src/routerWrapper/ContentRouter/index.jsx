@@ -17,6 +17,7 @@ import { closePraticienPanel, getStructureInfo, verifyToken } from '../../redux/
 import { useDimensions } from '../../hooks/useDimensions';
 import ConsigneRouter from './ConsigneRouter';
  import VerifyTokenPage from "../../pages/VerifyTokenPage"
+import CataloguePage from '../../pages/Catalogue';
 // import LoginPage from '../../pages/LoginPage'
 
 function ContentRouter() {
@@ -82,6 +83,7 @@ function ContentRouter() {
         <Route path="/motif/*" element={<MotifsRouter />} />
         <Route path="/lieu/*" element={<LieuxRouter />} />
         <Route path="/structure/*" element={<StructureRouter />} />
+        <Route path="/catalogue/" element={<CataloguePage />} />
       </Routes>
     </> :
    isVerifyingToken && !isTokenValid && <VerifyTokenPage/>

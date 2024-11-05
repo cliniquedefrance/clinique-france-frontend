@@ -1,0 +1,144 @@
+/* eslint-disable no-nested-ternary */
+import React, { useState, useEffect } from 'react';
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  Button,
+  FormControl,
+  FormLabel,
+  Input,
+  Alert,
+  AlertIcon,
+  Checkbox
+} from '@chakra-ui/react';
+import { CREATE_MODE, UPDATE_MODE, VIEW_MODE } from './constants';
+
+function MontureForm({ 
+  with: monture, 
+  isOpen, 
+  onClose, 
+  mode, 
+  onSave, 
+  onUpdate, 
+  process 
+}) {
+  const isViewMode = mode === VIEW_MODE;
+  
+  const [formData, setFormData] = useState({
+    brand: '',
+    model: '',
+    isInStock: true
+  });
+
+  useEffect(() => {
+    if (monture) {
+      setFormData({
+        brand: monture?.brand || '',
+        model: monture?.model || '',
+        isInStock: monture?.isInStock !== undefined ? monture.isInStock : true
+      });
+    }
+  }, [monture]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value
+    });
+  };
+
+  const handleSubmit = () => {
+    if (mode === CREATE_MODE) {
+      onSave(formData);
+    } else if (mode === UPDATE_MODE) {
+      onUpdate(formData);
+    }
+  };
+
+  return (
+    <Modal isOpen={isOpen} onClose={onClose}>
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader>
+          {mode === CREATE_MODE ? 'Créer une nouvelle monture' :
+           mode === UPDATE_MODE ? 'Modifier la monture' : 'Détails de la monture'}
+        </ModalHeader>
+        <ModalCloseButton />
+        <ModalBody>
+          {process.error && (
+            <Alert status="error" mb={4}>
+              <AlertIcon />
+              {process.error}
+            </Alert>
+          )}
+          {process.success && (
+            <Alert status="success" mb={4}>
+              <AlertIcon />
+              {process.success}
+            </Alert>
+          )}
+          <FormControl isRequired>
+            <FormLabel>Marque</FormLabel>
+            <Input
+              name="brand"
+              value={formData.brand}
+              onChange={handleChange}
+              placeholder="Ex: Tom Ford"
+              isDisabled={isViewMode}
+            />
+          </FormControl>
+          <FormControl mt={4} isRequired>
+            <FormLabel>Modèle</FormLabel>
+            <Input
+              name="model"
+              value={formData.model}
+              onChange={handleChange}
+              placeholder="Ex: FT5178 - 52-18 - Noir/Doré"
+              isDisabled={isViewMode}
+            />
+          </FormControl>
+          <FormControl mt={4}>
+            <FormLabel>En stock</FormLabel>
+            <Checkbox
+              name="isInStock"
+              isChecked={formData.isInStock}
+              isDisabled={isViewMode}
+              onChange={() =>
+                setFormData((prevData) => ({
+                  ...prevData,
+                  isInStock: !prevData.isInStock
+                }))
+              }
+            >
+              En stock
+            </Checkbox>
+          </FormControl>
+        </ModalBody>
+
+        <ModalFooter>
+          <Button onClick={onClose} mr={3}>
+            {isViewMode ? 'Fermer' : 'Annuler'}
+          </Button>
+          {!isViewMode && (
+            <Button
+              colorScheme="blue"
+              onClick={handleSubmit}
+              isLoading={process.loading}
+              disabled={process.loading}
+            >
+              {mode === CREATE_MODE ? 'Créer' : 'Mettre à jour'}
+            </Button>
+          )}
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
+  );
+}
+
+export default MontureForm;
