@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-catch */
 /* eslint-disable no-return-await */
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 
@@ -60,13 +61,69 @@ export async function deleteMonture(id) {
   return await response.json();
 }
 
-// Fonction pour toggler la disponibilité en stock d'une monture
-export async function toggleStock(id) {
-  const response = await fetch(`${BASE_URL}/montures/${id}/toggle-stock`, {
-    method: 'PUT',
-  });
-  if (!response.ok) {
-    throw new Error('Erreur lors du changement de la disponibilité de la monture');
+export async function updateQuantity(montureId, newQuantity) {
+  try {
+    const response = await fetch(`${BASE_URL}/montures/${montureId}/quantity`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ newQuantity }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update quantity');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    throw error;
   }
-  return await response.json();
 }
+
+
+export async function decreaseQuantity(montureId, amount) {
+  try {
+    const response = await fetch(`${BASE_URL}/montures/${montureId}/decrease`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ amount }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to decrease quantity');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    
+    throw error;
+  }
+}
+
+export async function increaseQuantity(montureId, amount) {
+  try {
+    const response = await fetch(`${BASE_URL}/montures/${montureId}/increase`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ amount }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to increase quantity');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+

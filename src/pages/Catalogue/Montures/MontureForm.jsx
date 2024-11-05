@@ -14,24 +14,29 @@ import {
   Input,
   Alert,
   AlertIcon,
-  Checkbox
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
 } from '@chakra-ui/react';
 import { CREATE_MODE, UPDATE_MODE, VIEW_MODE } from './constants';
 
-function MontureForm({ 
-  with: monture, 
-  isOpen, 
-  onClose, 
-  mode, 
-  onSave, 
-  onUpdate, 
-  process 
+function MontureForm({
+  with: monture,
+  isOpen,
+  onClose,
+  mode,
+  onSave,
+  onUpdate,
+  process
 }) {
   const isViewMode = mode === VIEW_MODE;
-  
+
   const [formData, setFormData] = useState({
     brand: '',
     model: '',
+    quantity: 1,
     isInStock: true
   });
 
@@ -40,6 +45,7 @@ function MontureForm({
       setFormData({
         brand: monture?.brand || '',
         model: monture?.model || '',
+        quantity: monture?.quantity || 1,
         isInStock: monture?.isInStock !== undefined ? monture.isInStock : true
       });
     }
@@ -67,7 +73,7 @@ function MontureForm({
       <ModalContent>
         <ModalHeader>
           {mode === CREATE_MODE ? 'Créer une nouvelle monture' :
-           mode === UPDATE_MODE ? 'Modifier la monture' : 'Détails de la monture'}
+            mode === UPDATE_MODE ? 'Modifier la monture' : 'Détails de la monture'}
         </ModalHeader>
         <ModalCloseButton />
         <ModalBody>
@@ -104,20 +110,27 @@ function MontureForm({
             />
           </FormControl>
           <FormControl mt={4}>
-            <FormLabel>En stock</FormLabel>
-            <Checkbox
-              name="isInStock"
-              isChecked={formData.isInStock}
-              isDisabled={isViewMode}
-              onChange={() =>
-                setFormData((prevData) => ({
-                  ...prevData,
-                  isInStock: !prevData.isInStock
-                }))
-              }
+            <FormLabel>Quantité</FormLabel>
+            <NumberInput
+              onChange={(value)=>{
+                setFormData({
+                  ...formData,
+                  quantity: value
+                });
+              }}
+              value={`${formData.quantity}`}
+
+              min={1}
+              step={5}
+              paddingLeft={2}
+              paddingRight={10}
             >
-              En stock
-            </Checkbox>
+              <NumberInputField />
+              <NumberInputStepper>
+                <NumberIncrementStepper />
+                <NumberDecrementStepper />
+              </NumberInputStepper>
+            </NumberInput>
           </FormControl>
         </ModalBody>
 

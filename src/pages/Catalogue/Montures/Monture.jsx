@@ -119,26 +119,10 @@ function MontureZone({ api, actions, children, r }) {
     // Filtrer et ordonner les montures
     const filteredMontures = useMemo(() => {
       let result = montures || [];
-  
-      // Filtrer par marque, modèle, ou date
-      if (filter === 'marque') {
-        result = result.filter((monture) =>
-          monture?.brand?.toLowerCase().includes(searchTerm?.toLowerCase())
-        );
-      } else if (filter === 'enStock') {
-        result = result.filter((monture) => monture.isInStock === true);
-      } else if (filter === 'vendu') {
-        result = result.filter((monture) => monture.isInStock === false);
-      } else if (filter === 'createdAt') {
-        result = result.sort((a, b) => 
-          order === 'asc' ? new Date(a.createdAt) - new Date(b.createdAt) : new Date(b.createdAt) - new Date(a.createdAt)
-        );
-      } else if (filter === 'updatedAt') {
-        result = result.sort((a, b) => 
-          order === 'asc' ? new Date(a.updatedAt) - new Date(b.updatedAt) : new Date(b.updatedAt) - new Date(a.updatedAt)
-        );
-      }
-  
+
+
+
+      
       // Recherche dans marque et modèle
       result = result?.filter((monture) =>
         monture?.brand?.toLowerCase().includes(searchTerm?.toLowerCase()) ||
@@ -154,7 +138,22 @@ function MontureZone({ api, actions, children, r }) {
         result = result.sort((a, b) =>
           order === 'asc' ? a.model.localeCompare(b.model) : b.model.localeCompare(a.model)
         );
+      }  else if (filter === 'quantity') {// Filtrer par marque, modèle, ou date
+        result = result.sort((a, b) => 
+          order === 'asc' ? Number(a.quantity) - Number(b.quantity) : Number(b.quantity) - Number(a.quantity)
+        );
+      } else if (filter === 'vendu') {
+        result = result.filter((monture) => monture.isInStock === false);
+      } else if (filter === 'createdAt') {
+        result = result.sort((a, b) => 
+          order === 'asc' ? new Date(a.createdAt) - new Date(b.createdAt) : new Date(b.createdAt) - new Date(a.createdAt)
+        );
+      } else if (filter === 'updatedAt') {
+        result = result.sort((a, b) => 
+          order === 'asc' ? new Date(a.updatedAt) - new Date(b.updatedAt) : new Date(b.updatedAt) - new Date(a.updatedAt)
+        );
       }
+  
   
       return result;
     }, [montures, filter, searchTerm, order]);
@@ -216,7 +215,7 @@ function MontureList() {
         <Tr>
           <Th>Marque</Th>
           <Th>Modèle</Th>
-          <Th>En stock</Th>
+          <Th>Quantité</Th>
           <Th>Action</Th>
         </Tr>
       </Thead>
@@ -225,7 +224,7 @@ function MontureList() {
           <Tr key={monture._id}>
             <Td>{highlightSearchTerm(monture.brand, searchTerm)}</Td>
             <Td>{highlightSearchTerm(monture.model, searchTerm)}</Td>
-            <Td>{monture.isInStock ? 'Oui' : 'Non'}</Td>
+            <Td >{monture?.quantity }</Td>
             <Td>
               <Menu>
                 <MenuButton as={IconButton} icon={<ChevronDownIcon />} />
@@ -296,7 +295,7 @@ function MontureFilter() {
     <Select value={filter} onChange={(e) => setFilter(e.target.value)}>
       <option value="">Tous</option>
       <option value="marque">Par marque</option>
-      <option value="enStock">En stock</option>
+      <option value="quantity">Quantité</option>
       <option value="vendu">Vendu</option>
       <option value="createdAt">Date de création</option>
       <option value="updatedAt">Date de mise à jour</option>
