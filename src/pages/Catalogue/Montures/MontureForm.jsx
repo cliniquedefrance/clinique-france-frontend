@@ -143,7 +143,7 @@ function MontureForm({
               colorScheme="blue"
               onClick={handleSubmit}
               isLoading={process.loading}
-              disabled={process.loading}
+              disabled={process.loading || process.success}
             >
               {mode === CREATE_MODE ? 'Créer' : 'Mettre à jour'}
             </Button>
