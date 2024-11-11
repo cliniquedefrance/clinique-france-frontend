@@ -115,7 +115,8 @@ function OrdonnanceOphtaPDF() {
           <View style={[styles.section, { gap: 5 }]}>
             <Text>NOM ET PRENOM  : {`${patient?.name.toUpperCase()} ${patient?.surname.toUpperCase()}`}</Text>
             <Text>AGE  : {calculerAge(patient?.birthdate)} ans</Text>
-            <Text style={{ marginVertical: 10, textAlign: 'center' }}>DATE: {new Date(ordonnance?.date).toLocaleDateString()}</Text>
+            <Text>DATE: {new Date(ordonnance?.date).toLocaleDateString()}</Text>
+            <Text style={{ marginVertical: 10, textAlign: 'center', fontWeight: 'bold', fontSize: '23px' }}>Ordonnance de verre correcteur</Text>
           </View>
 
           {/* Tableau Verres Correcteurs */}
@@ -131,7 +132,7 @@ function OrdonnanceOphtaPDF() {
             <Text style={styles.cell}>Droit</Text>
             <Text style={styles.cell}>{ordonnance?.oeilDroit?.SPH}</Text>
             <Text style={styles.cell}>{ordonnance?.oeilDroit?.CYL}</Text>
-            <Text style={styles.cell}>{`${ordonnance?.oeilDroit?.AXE}${ordonnance?.oeilDroit?.AXE ? "°":""}`}</Text>
+            <Text style={styles.cell}>{ordonnance?.oeilDroit?.AXE}</Text>
             <Text style={styles.cell}>{ordonnance?.oeilDroit?.ADD}</Text>
             <Text style={styles.cell}>{`${ordonnance?.oeilDroit?.EP}${ordonnance?.oeilDroit?.EP?'mw':""}`}</Text>
           </View>
@@ -139,7 +140,7 @@ function OrdonnanceOphtaPDF() {
             <Text style={styles.cell}>Gauche</Text>
             <Text style={styles.cell}>{ordonnance?.oeilGauche?.SPH}</Text>
             <Text style={styles.cell}>{ordonnance?.oeilGauche?.CYL}</Text>
-            <Text style={styles.cell}>{`${ordonnance?.oeilGauche?.AXE}${ordonnance?.oeilGauche?.AXE ? "°":""}`}</Text>
+            <Text style={styles.cell}>{ordonnance?.oeilGauche?.AXE}</Text>
             <Text style={styles.cell}>{ordonnance?.oeilGauche?.ADD}</Text>
             <Text style={styles.cell}>{`${ordonnance?.oeilGauche?.EP}${ordonnance?.oeilGauche?.EP?'mw':""}`}</Text>
           </View>
