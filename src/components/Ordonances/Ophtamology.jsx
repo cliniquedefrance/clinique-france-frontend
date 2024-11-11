@@ -64,13 +64,15 @@ function Ophtamology({ with: initialData, onSave, isOpen, loading, onClose, pati
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    
     if (name.startsWith("oeilDroit.") || name.startsWith("oeilGauche.")) {
       const [eye, field] = name.split(".");
+      const degreeValue = value && value !== "°" ? `${value.replace("°", "")}°` : ""
       setFormData((prevData) => ({
         ...prevData,
         [eye]: {
           ...prevData[eye],
-          [field]: value
+          [field]: field === 'AXE' ? degreeValue : value
         }
       }));
     } else {
