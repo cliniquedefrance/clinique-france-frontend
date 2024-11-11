@@ -52,6 +52,7 @@ function* verifyTokenSagga({onLogin}){
         type: types.ISTOKENVALID,
         truth: true,
       });
+      window.localStorage.setItem("connectedUser", JSON.stringify(result?.data?.theUser));
     }
   } catch (error) {
     yield put({
@@ -70,6 +71,7 @@ function* disconnect(){
       `${process.env.REACT_APP_BASE_URL}/disconnect/`,
     );
     if(result.success){
+      window.localStorage.removeItem("connectedUser")
       window.location = "/"
     }
   } catch (error) {

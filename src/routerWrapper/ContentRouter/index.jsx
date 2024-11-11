@@ -18,6 +18,7 @@ import { useDimensions } from '../../hooks/useDimensions';
 import ConsigneRouter from './ConsigneRouter';
  import VerifyTokenPage from "../../pages/VerifyTokenPage"
 import CataloguePage from '../../pages/Catalogue';
+import VentePage from '../../pages/Ventes';
 // import LoginPage from '../../pages/LoginPage'
 
 function ContentRouter() {
@@ -84,6 +85,7 @@ function ContentRouter() {
         <Route path="/lieu/*" element={<LieuxRouter />} />
         <Route path="/structure/*" element={<StructureRouter />} />
         <Route path="/catalogue/" element={<CataloguePage />} />
+        <Route path="/ventes/" element={<VentePage />} />
       </Routes>
     </> :
    isVerifyingToken && !isTokenValid && <VerifyTokenPage/>

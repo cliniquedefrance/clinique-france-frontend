@@ -135,7 +135,7 @@ function MontureForm({
         </ModalBody>
 
         <ModalFooter>
-          <Button onClick={onClose} mr={3}>
+          <Button isDisabled={process.success} onClick={onClose} mr={3}>
             {isViewMode ? 'Fermer' : 'Annuler'}
           </Button>
           {!isViewMode && (
@@ -143,7 +143,7 @@ function MontureForm({
               colorScheme="blue"
               onClick={handleSubmit}
               isLoading={process.loading}
-              disabled={process.loading || process.success}
+              isDisabled={process.success}
             >
               {mode === CREATE_MODE ? 'Créer' : 'Mettre à jour'}
             </Button>

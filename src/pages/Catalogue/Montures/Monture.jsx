@@ -250,8 +250,22 @@ function MonturePagination() {
 
   const totalPages = Math.ceil(totalMontures / itemsPerPage);
 
+  const [show, setShow] = useState(true)
+
+  useEffect(()=>{
+    if (currentPage > totalPages) {
+      setCurrentPage(1);
+    }
+    if (totalMontures <= itemsPerPage) {
+      setShow(false);
+    }else{
+      setShow(true)
+    }
+
+  },[totalMontures])
+
   return (
-    <div>
+    show && <div>
       <Button onClick={() => setCurrentPage(currentPage - 1)} isDisabled={currentPage === 1}>
         Précédent
       </Button>

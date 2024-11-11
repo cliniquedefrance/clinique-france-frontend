@@ -237,6 +237,9 @@ function NavigationBar() {
                   <Link to="/content/catalogue">
                     <MenuItem>Catalogue</MenuItem>
                   </Link>
+                  <Link to="/content/ventes">
+                    <MenuItem>Ventes</MenuItem>
+                  </Link>
                 </MenuList>
               </Menu>
             </Box>
