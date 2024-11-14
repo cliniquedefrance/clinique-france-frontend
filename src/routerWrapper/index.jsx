@@ -5,6 +5,7 @@ import ContentRouter from './ContentRouter';
 import AuthRouter from './AuthRouter';
 import AppointmentPDF from '../components/pdf/appointment-pdf';
 import OrdonnanceOphtaPDF from '../pages/PatientPages/Manage/ordonnance-ophta-pdf';
+import Proformat from '../pages/Ventes/PDF/Proformat';
 
 
 
@@ -39,6 +40,7 @@ function Routeur() {
         <Route path="/content/*" element={ <ContentRouter />} />
         <Route path="/print-pdf" element={<AppointmentPDF />} />
         <Route path="/print/ordonnance-ophta/:id?" element={<OrdonnanceOphtaPDF />} />
+        <Route path="/print/vente-proforma" element={<Proformat />}/>
       </Routes>
     </BrowserRouter>
   );
