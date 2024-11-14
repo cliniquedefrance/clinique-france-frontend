@@ -1,5 +1,10 @@
 import { Document, Image, Page, PDFViewer, StyleSheet, Text, View } from '@react-pdf/renderer'
 import React from 'react'
+import Logo from '../../../assets/images/icone 512-100.jpg'
+import Location from '../../../assets/images/location-dot-solid.png'
+import Phone from '../../../assets/images/phone.png'
+import Globe from '../../../assets/images/globe.png'
+import Envelop from '../../../assets/images/envelop.png'
 
 const styles = StyleSheet.create({
   bigPage: {
@@ -67,7 +72,7 @@ const styles = StyleSheet.create({
   contact: {
     width: '65%',
     position: 'absolute',
-    paddingLeft: 50,
+    paddingLeft: 40,
     top: 0,
     left: 0,
     borderBottomRightRadius: 40,
@@ -82,11 +87,11 @@ const styles = StyleSheet.create({
   contactBox: {
     width: '50%',
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
+    gap: 5
   },
   contactImage: {
-    width: 20,
-    height: 20,
+    width: 15,
   }
 });
 
@@ -100,13 +105,13 @@ export default function Proformat(){
         <Page size='A4' style={styles.bigPage} orientation="portrait">
           <View style={[styles.page, {opacity: 0.5, flexDirection: 'row', alignItems: 'center'}]}>
             {/* Background Image */}
-            <Image src='/favicon.png' />
+            <Image src={Logo} style={{width: '100%'}} />
           </View>
           <View style={styles.page}>
             {/* Header */}
             <View style={styles.header}>
                 <View>
-                    <Image src="/favicon.png" style={styles.logo} />
+                    <Image src={Logo} style={styles.logo} />
                 </View>
                 <View style={[styles.headerSection, {color: 'blue'}]} >
                     <View>
@@ -251,37 +256,39 @@ export default function Proformat(){
                 </View>
                 <Text style={{fontWeight: 'bold', marginTop: 20}}>Arreté cette proforma à la somme de cent cinq mille Franc CFA</Text>
             </View>
-            <Image 
+            {/*
+                <Image 
                 src='/favicon.png'
                 style={{width: 100, height: 100, marginLeft: 'auto', marginRight: 70}}
             />
+            */}
             <View style={styles.footer}>
                 <View style={styles.contact}>
                     <View style={{flexDirection: 'row', alignItems: 'center'}}>
                         <View style={styles.contactBox}>
-                            <Image src='/favicon.png' style={styles.contactImage} />
+                            <Image src={Logo} style={{width : 25, marginLeft: -5}} />
                             <Text>Clinique de France</Text>
                         </View>
                         <View style={styles.contactBox}>
-                            <Image src='/favicon.png' style={styles.contactImage} />
+                            <Image src={Envelop} style={styles.contactImage} />
                             <Text>sante@cliniquedefrance.com</Text>
                         </View>
                     </View>
                     
                     <View style={{flexDirection: 'row', alignItems: 'center'}}>
                         <View style={styles.contactBox}>
-                            <Image src='/favicon.png' style={styles.contactImage} />
+                            <Image src={Globe} style={styles.contactImage} />
                             <Text>www.cliniquedefrance.com:fr</Text>
                         </View>
                         <View style={styles.contactBox}>
-                            <Image src='/favicon.png' style={styles.contactImage} />
+                            <Image src={Phone} style={styles.contactImage} />
                             <Text>+237 689 254 161 / 652 151 976</Text>
                         </View>
                     </View>
 
                     <View style={{flexDirection: 'row', alignItems: 'center'}}>
                         <View style={styles.contactBox}>
-                            <Image src='/favicon.png' style={styles.contactImage} />
+                            <Image src={Location} style={styles.contactImage} />
                             <Text>Poste centrale face cathédrale</Text>
                         </View>
                  </View>
