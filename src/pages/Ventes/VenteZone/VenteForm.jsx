@@ -2,7 +2,12 @@ import React, { useState, useEffect } from 'react';
 import {
   Box, Button, Input, FormControl, FormLabel, Modal, ModalOverlay,
   ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter,
-  Text, Divider, Checkbox, Alert, AlertIcon
+  Text, Divider, Checkbox, Alert, AlertIcon,
+  Table,
+  Thead,
+  Tr,
+  Td,
+  Tbody
 } from '@chakra-ui/react';
 import { SearchMonture, SearchOrdonnance } from './VenteComponnents';
 
@@ -32,6 +37,8 @@ function VenteForm({
   const [isOrdonnanceModalOpen, setIsOrdonnanceModalOpen] = useState(false);
   const [isMontureModalOpen, setIsMontureModalOpen] = useState(false);
   const [isOrdonnanceChecked, setIsOrdonnanceChecked] = useState(false);
+  const [selectedOrdonnance, setSelectedOrdonnance] = useState(null);
+  const [selectedMontureList, setSelectedMontureList] = useState([])
 
   useEffect(() => {
     if (inFormVente && mode === 'update') {
@@ -54,6 +61,7 @@ function VenteForm({
 
   // Gestion de la sélection d'une ordonnance
   const handleSelectOrdonnance = (ordonnance) => {
+    setSelectedOrdonnance(ordonnance)
     setFormData((prev) => ({
       ...prev,
       ordonnance: ordonnance._id,
@@ -66,6 +74,7 @@ function VenteForm({
 
   // Gestion de la sélection d'une monture
   const handleSelectMonture = (monture) => {
+    setSelectedMontureList(prev => [...prev,monture])
     setFormData((prev) => ({
       ...prev,
       articles: [...prev.articles, { monture: monture._id, quantite: 1, prixUnitaire: 0, remise: 0 }]
@@ -96,11 +105,13 @@ function VenteForm({
     if (checked) {
       setIsOrdonnanceModalOpen(true);  // Ouvrir le modal de recherche d'ordonnance lorsque la case est cochée
     } else {
+      setSelectedOrdonnance(null)
       setFormData((prev) => ({
         ...prev,
         ordonnance: null,
         ordonnancePrixOD: 0,
-        ordonnancePrixOG: 0
+        ordonnancePrixOG: 0,
+        client:undefined
       }));
     }
   };
@@ -167,16 +178,48 @@ function VenteForm({
             </Checkbox>
           </FormControl>
           
-          {isOrdonnanceChecked && formData.ordonnance && (
+          {isOrdonnanceChecked && formData.ordonnance && selectedOrdonnance && (
             <Box>
-              <Text>Information du patient :</Text>
-              <Text>Nom : {formData.client ? formData.client.name : 'Non enregistré'}</Text>
-              <Text>Contact : {formData.client.telephone}</Text>
+              <Text sx={{fontWeight:'bold', textDecoration:"underline",marginBottom:2}}>Information du patient</Text>
+              <Box display="flex" flexDirection='row' justifyContent="space-between" alignItems='center'>
+                <Text sx={{fontWeight: 'bold'}}>Nom</Text>
+                <Text>{formData.client ? formData.client.name : 'Non enregistré'}</Text>
+              </Box>
+              <Box display="flex" flexDirection='row' justifyContent="space-between" alignItems='center'>
+                <Text sx={{fontWeight: 'bold'}}>Contact</Text>
+                <Text>{formData.client.telephone}</Text>
+              </Box>
+              
 
               <Divider my={4} />
-              <Text>Ordonnance :</Text>
-              <Text>Sphère Oeil Droit : {formData.ordonnance?.oeilDroit?.SPH}</Text>
-              <Text>Sphère Oeil Gauche : {formData.ordonnance?.oeilGauche?.SPH}</Text>
+              <Text sx={{fontWeight:'bold', textDecoration:"underline",marginBottom:2}}>Ordonnance </Text>
+              <Table>
+                <Thead>
+                  <Tr>
+                    <Td>Oeil</Td>
+                    <Td>Sphère</Td>
+                    <Td>Cylindre</Td>
+                    <Td>AXE</Td>
+                    <Td>ADD</Td>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                <Tr>
+                    <Td>OG</Td>
+                    <Td>{selectedOrdonnance?.oeilGauche?.SPH}</Td>
+                    <Td>{selectedOrdonnance?.oeilGauche?.CYL}</Td>
+                    <Td>{selectedOrdonnance?.oeilGauche?.AXE}</Td>
+                    <Td>{selectedOrdonnance?.oeilGauche?.ADD}</Td>
+                  </Tr>
+                  <Tr>
+                    <Td>OD</Td>
+                    <Td>{selectedOrdonnance?.oeilDroit?.SPH}</Td>
+                    <Td>{selectedOrdonnance?.oeilDroit?.CYL}</Td>
+                    <Td>{selectedOrdonnance?.oeilDroit?.AXE}</Td>
+                    <Td>{selectedOrdonnance?.oeilDroit?.ADD}</Td>
+                  </Tr>
+                </Tbody>
+              </Table>
               {/* Autres détails de l'ordonnance */}
               <FormControl mb={4} flexDirection="row">
                 <FormLabel>Prix Oeil Droit</FormLabel>
@@ -204,7 +247,10 @@ function VenteForm({
           {/* Articles */}
           {formData.articles.map((article, index) => (
             <Box key={index}>
-              <Text>Monture {index + 1}:</Text>
+              <Box display="flex" flexDirection='row' justifyContent="space-between" alignItems='center'>
+                <Text sx={{fontWeight: 'bold'}}>Monture {index + 1}:</Text>
+                <Text>{selectedMontureList[index].model}</Text>
+              </Box>
               <FormControl mb={2}>
                 <FormLabel>Quantité</FormLabel>
                 <Input
