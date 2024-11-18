@@ -441,9 +441,9 @@ function ManagePatient() {
                     </Tfoot>
                   </Table>
                 </TableContainer>
-                <HStack margin={15}>
-                  <Button w="full" colorScheme="blue" onClick={() => navigate(`/content/patient/upsert/${id}`)}>Modifier</Button>
-                  <Button w="full" colorScheme="blue" onClick={() => navigate(`/content/patient/change-pwd/${id}`)}>Modifier le mot de passe</Button>
+                <HStack margin={15} spacing={4} justify='flex-end'>
+                  <Button w='250px' colorScheme="blue" onClick={() => navigate(`/content/patient/upsert/${id}`)}>Modifier</Button>
+                  <Button w="250px" colorScheme="blue" onClick={() => navigate(`/content/patient/change-pwd/${id}`)}>Modifier le mot de passe</Button>
                 </HStack>
               </TabPanel>
 
