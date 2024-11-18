@@ -9,6 +9,8 @@ import {
   AlertIcon,
   AlertTitle,
   AlertDescription,
+  Divider,
+  Heading,
 } from '@chakra-ui/react';
 
 import { getAllPatients } from '../../../redux/patient/actions';
@@ -19,15 +21,40 @@ import styles from './style';
 import user from '../../../assets/images/user.png';
 import { renderObjectWithoutField } from '../../../utils/helpers';
 import Ophtamology from '../../../components/Ordonances/Ophtamology';
-import { createOrdonnance, deleteOrdonnance, getOrdonnancesByPatient, updateOrdonnance } from './ordonnance.api';
+import { createOrdonnance, deleteOrdonnance, getAllOrdonnances, getOrdonnancesByPatient, updateOrdonnance } from './ordonnance.api';
 import OrdonnanceOphtaCard from '../../../components/Ordonances/OrdonnaceOphtaCard';
 import DeleteRessourceDialogue from '../../../components/Ressource/DeleteRessource';
 import { CREATE_MODE, ORDONNANCE_OPHTA_TO_PRINT, ORDONNANCE_RESSOURCE, UPDATE_MODE, VIEW_MODE } from './constants';
+import VenteForm from '../../Ventes/VenteZone/VenteForm';
+import { creerVente, obtenirToutesLesVentes } from '../../Ventes/vente.api';
+import { VenteFilter, VenteList, VentePagination,  VenteZone } from '../../Ventes/VenteZone/VenteComponnents';
+import { getAllMontures } from '../../Catalogue/Montures/monture.api';
+
+const api = {
+  getVentes: obtenirToutesLesVentes,
+  getOrdonnances: getAllOrdonnances,
+  getMontures: getAllMontures,
+};
+
+
 
 
 function ManagePatient() {
+
     const dispatch = useDispatch();
   const { id } = useParams();
+
+  const patientVenteApi = {
+    getVentes: async () => {
+      const ventes = await obtenirToutesLesVentes();
+      const patientVentes = ventes.filter(vente => vente?.client?._id === id );
+      return patientVentes
+  
+    },
+    getOrdonnances: getAllOrdonnances,
+    getMontures: getAllMontures,
+  }
+
   const patients = useSelector((state) => state.Patient.patients);
   const [patientToManage, setPatientToManage] = useState({});
   const [allOrdonnances, setAllOrdonnances] = useState([]);
@@ -37,7 +64,17 @@ function ManagePatient() {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState(VIEW_MODE);
   const [toDelete, setToDelete] = useState({ type: "none", data: null });
-  const [modalOrdoState, setModalOrdoState] = useState({error:"", loading:false, success:""})
+  const [modalOrdoState, setModalOrdoState] = useState({error:"", loading:false, success:""});
+  const [refreshPatientVenteList, setRefreshPatientVenteList] = useState(true);
+  const [inVenteFormProps, setInVenteFormProps] = useState({
+    mode:"update",
+    showModal: false,
+    inFormVente : null,
+    inFormProcess : {error:"", loading:false, success:""},
+    onCreate:() => null,
+    onUpdate: ()=> null,
+    onClose : ()=>null
+  })
   const navigate = useNavigate();
   
   const handleFetchAllOrdonnances = async () => {
@@ -229,7 +266,76 @@ function ManagePatient() {
     }
   };
 
- 
+ const onVenteFormClose = ()=> {
+  setInVenteFormProps({
+    mode:"update",
+    showModal: false,
+    inFormVente : null,
+    inFormProcess : {error:"", loading:false, success:""},
+    onCreate:() => null,
+    onUpdate: ()=> null,
+    onClose : ()=>null
+  })
+ }
+
+  async function onSaveVente(vente,print=false){
+    try {
+        setInVenteFormProps(prev => ({
+          ...prev,
+          inFormProcess: { error: null, success: null, loading: true }
+        }))
+        const createdVente = await creerVente(vente);
+        if(createdVente){
+          setInVenteFormProps(prev => ({
+            ...prev,
+            inFormProcess: { error: null, success: "Vente crée avec succès", loading: true }
+          }))
+          if(print===true){
+            window.alert(` Impression de la vente : ${ createdVente?._id} \n le service d'impression n'est pes encore implémenté. `)
+          }
+          setRefreshPatientVenteList(prev => !prev)
+          onVenteFormClose()
+
+        }else{
+
+          setInVenteFormProps(prev => ({
+            ...prev,
+            inFormProcess: { error: null, success: "erreur lors de la création de la vente", loading: true }
+          }))
+        }
+    
+    } catch (error) {
+      setInVenteFormProps(prev => ({
+        ...prev,
+        inFormProcess: { error: null, success: "erreur lors de la création de la vente", loading: true }
+      }))
+    }
+  
+  }
+
+  const formatInFormVenteWithOrdonnance = (ordonnance) => ({
+      client: ordonnance.patient,
+      clientNonEnregistre: { nom: '', contact: '' },
+      ordonnance,
+      ordonnancePrixOD: 0,
+      ordonnancePrixOG: 0,
+      articles: [],
+      montantTotal: 0,
+      montantPaye: 0,
+      resteAPayer: 0
+    })
+
+ const handleSaleOrdonnance = (ordonnance) => {
+  const inVenteFormData = formatInFormVenteWithOrdonnance(ordonnance);
+ setInVenteFormProps(prev => ({
+  ...prev,
+  showModal:true,
+  inFormVente: inVenteFormData,
+  onUpdate: onSaveVente,
+ }))
+ }
+
+
 
   useEffect(() => {
     dispatch({ type: UPDATE_PATIENT_FINISHED });
@@ -265,8 +371,33 @@ function ManagePatient() {
 
   const { name, civility, surname, telephone, email, photo } = patientToManage;
 
+  const actions = [
+    // {
+    //     label: "modifier",
+    //     action: (vente)=> handleUpdateVente(vente)
+
+    // },
+    // {
+    //     label: "Supprimer",
+    //     action: (vente)=> {
+    //       setVenteToDel(vente);
+    //       setConfirmDel(true)
+    //     }
+
+    // },
+    {
+        label: "imprimer facture",
+        action: (vente)=> window.alert(`Impr vente \n ${JSON.stringify(vente)}`)
+
+    },
+    {
+      label:"Voir JSON",
+      action : (vente) => window.alert(JSON.stringify(vente, null, 2))
+    }
+ ]
   return (
-    <Flex style={styles.formContainer} backgroundColor="#2c3e50" overflow="hidden">
+    <VenteZone api={api} inOtherPage>
+      <Flex style={styles.formContainer} backgroundColor="#2c3e50" overflow="hidden">
       <HStack width="100%" flex={1} justifyContent="space-between" alignItems="center" gap="2px">
         <VStack padding={2} backgroundColor="whitesmoke" height="100%" position="relative" flex={1 / 4} justifyContent="center" alignItems="center">
           <img src={photo || user} alt="Patient" width="72px" height="72px" />
@@ -281,7 +412,7 @@ function ManagePatient() {
             <TabList mb="1em" borderBottomColor="#2c3e50" borderBottomWidth="2px" borderTopColor="blue.500" borderTopWidth="2px">
               <Tab _selected={{ color: 'white', bg: "#2c3e50" }}>Détails du patient</Tab>
               <Tab _selected={{ color: 'white', bg: "#2c3e50" }}>Ordonnances</Tab>
-              <Tab _selected={{ color: 'white', bg: "#2c3e50" }}>Factures</Tab>
+              <Tab _selected={{ color: 'white', bg: "#2c3e50" }}>Statistiques</Tab>
             </TabList>
             <TabPanels>
               <TabPanel overflow="auto" maxHeight={500}>
@@ -361,6 +492,7 @@ function ManagePatient() {
                                               onDelete={handleDeleteOrdonnance}
                                               onUpdate={handleUpdateOrdonnance}
                                               onPrint={onPrint}
+                                              onSale={handleSaleOrdonnance}
                                             />
                                           ))}
                  </>
@@ -370,15 +502,27 @@ function ManagePatient() {
               </TabPanel>
 
               <TabPanel>
-                <p>Pas encore implémenté</p>
+              <Heading as="h2" mb={4}>
+         Ventes du patient
+      </Heading>
+                <VenteZone r={refreshPatientVenteList}  api={patientVenteApi}>
+                  <VenteFilter/>
+                  <Divider mt={4} mb={4} />
+                  <VenteList actions={actions}/>
+                  <Divider mt={4} mb={4} />
+                  <VentePagination/>
+                </VenteZone>
+                
               </TabPanel>
             </TabPanels>
           </Tabs>
         </VStack>
       </HStack>
-
+      <VenteForm {...inVenteFormProps} onClose={onVenteFormClose}/>
       <DeleteRessourceDialogue title="suppression ordonnance"  open={confirmDel} onClose={hideModal} ressourceName={ORDONNANCE_RESSOURCE} onDelete={onDelete} />
     </Flex>
+    </VenteZone>
+    
   );
 }
 

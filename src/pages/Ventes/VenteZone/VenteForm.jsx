@@ -1,5 +1,5 @@
 /* eslint-disable no-restricted-globals */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
   Box, Button, Input, FormControl, FormLabel, Modal, ModalOverlay,
   ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter,
@@ -16,7 +16,7 @@ import {
   NumberDecrementStepper,
   HStack
 } from '@chakra-ui/react';
-import { SearchMonture, SearchOrdonnance } from './VenteComponnents';
+import { SearchMonture, SearchOrdonnance, VenteContext } from './VenteComponnents';
 
 function VenteForm({
   mode,
@@ -25,7 +25,7 @@ function VenteForm({
   inFormProcess,
   onCreate,
   onUpdate,
-  onClose
+  onClose,
 }) {
 
   // Initialisation de formData selon le mode
@@ -41,6 +41,7 @@ function VenteForm({
     resteAPayer: 0
   });
 
+  const {inOtherPage} = useContext(VenteContext)
   const [isOrdonnanceModalOpen, setIsOrdonnanceModalOpen] = useState(false);
   const [isMontureModalOpen, setIsMontureModalOpen] = useState(false);
   const [isOrdonnanceChecked, setIsOrdonnanceChecked] = useState(false);
@@ -145,11 +146,11 @@ function VenteForm({
   };
 
   // Gestion de la soumission du formulaire
-  const handleSubmit = () => {
+  const handleSubmit = (print=false) => {
     if (mode === 'create') {
       onCreate(formData);
     } else if (mode === 'update') {
-      onUpdate(formData);
+      onUpdate(formData,print);
     }
     // onClose();
   };
@@ -451,9 +452,22 @@ function VenteForm({
           </FormControl>
 
           <Text>Reste à Payer: {formData.resteAPayer}</Text>
+          {inFormProcess.error && (
+            <Alert status="error" mb={4}>
+              <AlertIcon />
+              {inFormProcess.error}
+            </Alert>
+          )}
+          {inFormProcess.success && (
+            <Alert status="success" mb={4}>
+              <AlertIcon />
+              {inFormProcess.success}
+            </Alert>
+          )}
         </ModalBody>
 
         <ModalFooter>
+          {inOtherPage && <Button onClick={()=>handleSubmit(true)} >Imprimer la Proforma</Button>}
           <Button colorScheme="blue" onClick={handleSubmit}>Enregistrer</Button>
           <Button variant="ghost" onClick={handleClose}>Annuler</Button>
         </ModalFooter>

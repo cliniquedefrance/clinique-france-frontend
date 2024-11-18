@@ -79,7 +79,7 @@ const highlightSearchTerm = (text, term) => {
   if (!term) return text;
   const regex = new RegExp(`(${term})`, 'gi');
   return text.split(regex).map((part, index) => 
-    part.toLowerCase() === term.toLowerCase() ? <strong key={index}>{part}</strong> : part
+    part.toLowerCase() === term.toLowerCase() ? <strong style={{color:"green"}} key={index}>{part}</strong> : part
   );
 };
 

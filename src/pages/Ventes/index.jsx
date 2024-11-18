@@ -324,7 +324,7 @@ function VentePage() {
       <VenteZone r={refreshList} api={api} >
         <VStack align="start" spacing={4} mb={6} width="100%">
           <VenteSearch />
-          <HStack spacing={4}>
+          <HStack spacing={4} align="center" mb={4}>
             <VenteFilter />
             <VenteOrder />
             <Button colorScheme='blue' minW={200} onClick={handleCreateVente}>Lancer une vente</Button>

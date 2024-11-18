@@ -2,7 +2,7 @@
 import React from "react";
 import { Box, Text, Button, VStack, HStack, useBreakpointValue } from "@chakra-ui/react";
 
-export default function OrdonnanceOphtaCard({ ordonnance, onView, onDelete, onUpdate, onPrint }) {
+export default function OrdonnanceOphtaCard({ ordonnance, onView, onDelete, onUpdate, onPrint, onSale=()=>null }) {
   const { date, label, traitements, verre, matiere, port, createdAt, updatedAt } = ordonnance;
   const buttonAlignment = useBreakpointValue({ base: "start", md: "end" }); // Aligner à droite pour les grands écrans
 
@@ -23,6 +23,7 @@ export default function OrdonnanceOphtaCard({ ordonnance, onView, onDelete, onUp
         <Button colorScheme="yellow" onClick={() => onUpdate(ordonnance)}>Modifier</Button>
         <Button colorScheme="red" onClick={() => onDelete(ordonnance)}>Supprimer</Button>
         <Button colorScheme="teal" onClick={() => onPrint(ordonnance)}>Imprimer</Button>
+        <Button colorScheme="purple" onClick={()=> onSale(ordonnance)} >Lancer une vente</Button>
       </HStack>
     </Box>
   );

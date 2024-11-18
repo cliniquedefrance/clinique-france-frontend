@@ -14,8 +14,8 @@ const VenteContext = createContext(null);
 const highlightSearchTerm = (text ='', term) => {
     if (!term) return text;
     const regex = new RegExp(`(${term})`, 'gi');
-    return text.split(regex).map((part, index) => 
-      part.toLowerCase() === term.toLowerCase() ? <strong key={index}>{part}</strong> : part
+    return text?.split(regex).map((part, index) => 
+      part.toLowerCase() === term.toLowerCase() ? <strong style={{color:'green'}} key={index}>{part}</strong> : part
     );
   };
 
@@ -56,162 +56,182 @@ function VenteState({ process, retryFunction, setProcess }) {
     );
   }
 
-function VenteZone({ r,api, user, onPrintFacture, children }) {
-  const [ventes, setVentes] = useState([]);
-  const [ordonnances, setOrdonnances] = useState([]);
-  const [montures, setMontures] = useState([]);
-  const [filteredVentes, setFilteredVentes] = useState([]);
-  const [filters, setFilters] = useState({searchTerm:""});
-  const [sortOrder, setSortOrder] = useState('desc'); // 'asc' or 'desc'
-  const [sortKey, setSortKey] = useState('dateVente'); // Default sort by date
-  const [process, setProcess] = useState({ error: null, success: null, loading: false });
-
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(5);
-
-  const loadVentes = async () => {
-    try {
-      setProcess({ ...process, loading: true });
-      const data = await api.getVentes(); 
-      setVentes(data); 
-      setProcess({ error: null, success: 'Ventes chargées avec succès', loading: false });
-    } catch (error) {
-      setProcess({ error: 'Erreur lors du chargement des Ventes', success: null, loading: false });
-    }
-  };
-
-  const loadOrdonnances = async () => {
-    try {
-      setProcess({ ...process, loading: true });
-      const data = await api.getOrdonnances(); 
-      setOrdonnances(data); 
-      setProcess({ error: null, success: 'Ordonnances chargées avec succès', loading: false });
-    } catch (error) {
-      setProcess({ error: 'Erreur lors du chargement des Ordonnances', success: null, loading: false });
-    }
-  };
-
-  const loadMontures = async () => {
-    try {
-      setProcess({ ...process, loading: true });
-      const data = await api.getMontures(); 
-      setMontures(data); 
-      setProcess({ error: null, success: 'Montures chargées avec succès', loading: false });
-    } catch (error) {
-      setProcess({ error: 'Erreur lors du chargement des montures', success: null, loading: false });
-    }
-  };
-
-  // Charger les ventes, ordonnances et montures au montage du composant
-  useEffect(() => {
-    loadVentes();
-    loadOrdonnances();
-    loadMontures();
-  }, [r]);
 
 
-  const refresh = () => {
-    loadVentes();
-    loadOrdonnances();
-    loadMontures();
-
-  };
-
-  // Appliquer les filtres et le tri sur les ventes
-  const applyFiltersAndSorting = useCallback(() => {
-    let result = [...ventes];
-    
-    // Filtrage
-    if (filters.searchTerm) {
-      const search = filters.searchTerm.toLowerCase();
-      result = result.filter(
-        (vente) =>
-          (vente.client?.name && vente.client.name.toLowerCase().includes(search)) || (vente.clientNonEnregistre?.nom && vente.clientNonEnregistre?.nom.toLowerCase().includes(search)) ||
-          (vente.articles.some(article => 
-            article.monture.brand.toLowerCase().includes(search) ||
-            article.monture.model.toLowerCase().includes(search)
-          ))
-      );
-    }
-
-    // Tri
-    result.sort((a, b) => {
-      const aValue = a[sortKey];
-      const bValue = b[sortKey];
-      if (sortOrder === 'asc') return aValue > bValue ? 1 : -1;
-      return aValue < bValue ? 1 : -1;
-    });
-
-    setFilteredVentes(result);
-  }, [ventes, filters, sortKey, sortOrder]);
-
-   // Pagination
-   const paginatedVentes = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    return filteredVentes.slice(startIndex, startIndex + itemsPerPage);
-  }, [filteredVentes, currentPage, itemsPerPage]);
-
-  useEffect(() => {
-    applyFiltersAndSorting();
-  }, [filters, sortKey, sortOrder, ventes, applyFiltersAndSorting]);
-
-
-  const value = useMemo(() => ({
-    ventes:paginatedVentes, // Utilisé dans VenteList pour afficher la liste complète
-    filteredVentes, // Utilisé pour afficher les résultats filtrés et triés dans VenteList
-    ordonnances, // Utilisé dans SearchOrdonnance
-    montures, // Utilisé dans SearchMonture et VenteForm
-    filters, // Utilisé dans VenteFilter pour appliquer les filtres
-    setFilters, // Utilisé dans VenteFilter pour modifier les filtres appliqués
-    sortKey, // Utilisé dans VenteSorter pour trier par une clé donnée
-    setSortKey, // Utilisé dans VenteSorter pour définir la clé de tri
-    sortOrder, // Utilisé dans VenteOrder pour ordonner croissant/décroissant
-    setSortOrder, // Utilisé dans VenteOrder pour modifier l'ordre de tri
-    onPrintFacture, // Utilisé dans VenteList pour imprimer une facture spécifique
-    user, // utilisé dans le future pour ajouter celui qui créait la facture 
-    api, // Utilisé pour les appels API dans VenteCreatorButton et VenteList
-    refresh, // pour actualiser
-    process, // le process
-    setProcess,
-    setCurrentPage,
-    setItemsPerPage,
-    itemsPerPage,
-    totalVentes: filteredVentes.length
-  }), [ventes, filteredVentes, ordonnances, montures, filters, sortKey, sortOrder, onPrintFacture, process, user, api]);
-
-  return (
-    <VenteContext.Provider value={value}>
-      <VenteState  process={process} setProcess={setProcess} retryFunction={refresh} />
-      {children}
-      
-    </VenteContext.Provider>
-  );
-}
-
+  function VenteZone({ r, api, user, onPrintFacture, children, inOtherPage = false }) {
+    const [ventes, setVentes] = useState([]);
+    const [ordonnances, setOrdonnances] = useState([]);
+    const [montures, setMontures] = useState([]);
+    const [filteredVentes, setFilteredVentes] = useState([]);
+    const [filters, setFilters] = useState({ searchTerm: "", status: "", clientType: "", saleDate: "" });
+    const [sortOrder, setSortOrder] = useState('desc'); // 'asc' or 'desc'
+    const [sortKey, setSortKey] = useState('dateVente'); // Default sort by date
+    const [process, setProcess] = useState({ error: null, success: null, loading: false });
+  
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(5);
+  
+    // Chargement des ventes, ordonnances et montures
+    const loadVentes = async () => {
+      try {
+        setProcess({ ...process, loading: true });
+        const data = await api.getVentes();
+        setVentes(data);
+        setProcess({ error: null, success: 'Ventes chargées avec succès', loading: false });
+      } catch (error) {
+        setProcess({ error: 'Erreur lors du chargement des Ventes', success: null, loading: false });
+      }
+    };
+  
+    const loadOrdonnances = async () => {
+      try {
+        const data = await api.getOrdonnances();
+        setOrdonnances(data);
+      } catch (error) {
+        setProcess({ error: 'Erreur lors du chargement des Ordonnances', success: null, loading: false });
+      }
+    };
+  
+    const loadMontures = async () => {
+      try {
+        const data = await api.getMontures();
+        setMontures(data);
+      } catch (error) {
+        setProcess({ error: 'Erreur lors du chargement des Montures', success: null, loading: false });
+      }
+    };
+  
+    useEffect(() => {
+      loadVentes();
+      loadOrdonnances();
+      loadMontures();
+    }, [r]);
+  
+    const refresh = () => {
+      loadVentes();
+      loadOrdonnances();
+      loadMontures();
+    };
+  
+    // Fonction d'application des filtres et du tri
+    const applyFiltersAndSorting = useCallback(() => {
+      let result = [...ventes];
+  
+      // Filtrage
+      if (filters.searchTerm) {
+        const search = filters.searchTerm.toLowerCase();
+        result = result.filter((vente) => {
+          const clientName = vente.client?.name?.toLowerCase() || '';
+          const clientNonEnregistreName = vente.clientNonEnregistre?.nom?.toLowerCase() || '';
+  
+          const articleMatch = vente.articles.some(article => {
+            const brand = article.monture?.brand?.toLowerCase() || '';
+            const model = article.monture?.model?.toLowerCase() || '';
+            return brand.includes(search) || model.includes(search);
+          });
+  
+          return clientName.includes(search) || clientNonEnregistreName.includes(search) || articleMatch;
+        });
+      }
+  
+      // Tri
+      result.sort((a, b) => {
+        const aValue = a[sortKey] ?? '';
+        const bValue = b[sortKey] ?? '';
+  
+        if (typeof aValue === 'string' && typeof bValue === 'string') {
+          return sortOrder === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+        }
+  
+        return sortOrder === 'asc' ? aValue - bValue : bValue - aValue;
+      });
+  
+      setFilteredVentes(result);
+    }, [ventes, filters, sortKey, sortOrder]);
+  
+    // Pagination
+    const paginatedVentes = useMemo(() => {
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      return filteredVentes.slice(startIndex, startIndex + itemsPerPage);
+    }, [filteredVentes, currentPage, itemsPerPage]);
+  
+    // Appliquer le filtrage et le tri à chaque modification des filtres ou du tri
+    useEffect(() => {
+      applyFiltersAndSorting();
+    }, [filters, sortKey, sortOrder, ventes, applyFiltersAndSorting]);
+  
+    const value = useMemo(() => ({
+      ventes: paginatedVentes,
+      filteredVentes,
+      ordonnances,
+      montures,
+      filters,
+      setFilters,
+      sortKey,
+      setSortKey,
+      sortOrder,
+      setSortOrder,
+      onPrintFacture,
+      user,
+      api,
+      refresh,
+      process,
+      setProcess,
+      setCurrentPage,
+      setItemsPerPage,
+      itemsPerPage,
+      totalVentes: filteredVentes.length,
+      inOtherPage,
+      currentPage,
+    }), [
+      paginatedVentes, filteredVentes, ordonnances, montures,
+      filters, sortKey, sortOrder, onPrintFacture,
+      process, user, api, currentPage, itemsPerPage
+    ]);
+  
+    return (
+      <VenteContext.Provider value={value}>
+        {!inOtherPage && (
+          <VenteState process={process} setProcess={setProcess} retryFunction={refresh} />
+        )}
+        {children}
+      </VenteContext.Provider>
+    );
+  }
+  
 
 
 
 // VenteSearch pour la recherche
 function VenteSearch() {
-    const { filters, setFilters } = useContext(VenteContext);
-  
-    const handleSearchChange = (e) => {
-      setFilters((prevFilters) => ({
-        ...prevFilters,
-        searchTerm: e.target.value,
-      }));
-    };
-  
-    return (
-      <Input
-        placeholder="Rechercher une vente par nom de patient, marque ou modèle de monture"
-        value={filters.searchTerm || ''}
-        onChange={handleSearchChange}
-        variant="outline"
-        mb={4}
-      />
-    );
-  }
+  const { filters, setFilters } = useContext(VenteContext);
+
+  const handleSearchChange = (e) => {
+    const searchTerm = e.target.value;
+
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      searchTerm,
+    }));
+  };
+
+  // Utiliser useEffect pour voir les changements dans filters
+  useEffect(() => {
+    console.log("Recherche mise à jour :", filters.searchTerm);
+  }, [filters.searchTerm]);
+
+  return (
+    <Input
+      placeholder="Rechercher une vente par nom de patient, marque ou modèle de monture"
+      value={filters.searchTerm || ""}
+      onChange={handleSearchChange}
+      variant="outline"
+      mb={4}
+    />
+  );
+}
+
+
 
   // va pour SearchOrdonnance 
   function SearchOrdonnance({ isOpen, onClose, onSelect }) {
@@ -318,49 +338,68 @@ function VenteSearch() {
     const { filters, setFilters } = useContext(VenteContext);
   
     const handleStatusChange = (e) => {
+      const status = e.target.value;
       setFilters((prevFilters) => ({
         ...prevFilters,
-        status: e.target.value,
+        status,
       }));
     };
   
     const handleClientTypeChange = (e) => {
+      const clientType = e.target.value;
       setFilters((prevFilters) => ({
         ...prevFilters,
-        clientType: e.target.value,
+        clientType,
       }));
     };
   
     const handleDateChange = (e) => {
+      const saleDate = e.target.value;
       setFilters((prevFilters) => ({
         ...prevFilters,
-        saleDate: e.target.value,
+        saleDate,
       }));
     };
   
+    // Debugging pour voir les changements dans les filtres
+    useEffect(() => {
+      console.log("Filtres mis à jour :", filters);
+    }, [filters]);
+  
     return (
-      <HStack mb={4} >
-        <Select placeholder="Statut de paiement" onChange={handleStatusChange} value={filters.status || ''}>
+      <HStack spacing={4} mb={4}>
+        {/* Filtrer par statut */}
+        <Select
+          placeholder="Statut de paiement"
+          onChange={handleStatusChange}
+          value={filters.status || ""}
+        >
           <option value="payé">Payé</option>
           <option value="partiel">Partiel</option>
           <option value="impayé">Impayé</option>
         </Select>
-        
-        <Select placeholder="Type de client" onChange={handleClientTypeChange} value={filters.clientType || ''} >
+  
+        {/* Filtrer par type de client */}
+        <Select
+          placeholder="Type de client"
+          onChange={handleClientTypeChange}
+          value={filters.clientType || ""}
+        >
           <option value="patient">Patient enregistré</option>
           <option value="nonEnregistre">Client non enregistré</option>
         </Select>
   
+        {/* Filtrer par date de vente */}
         <Input
           type="date"
           placeholder="Date de vente"
           onChange={handleDateChange}
-          value={filters.saleDate || ''}
-          
+          value={filters.saleDate || ""}
         />
       </HStack>
     );
   }
+  
   
 
   function VenteSorter() {
@@ -389,7 +428,7 @@ function VenteSearch() {
     };
   
     return (
-      <Button onClick={toggleOrder} variant="outline" >
+      <Button  onClick={toggleOrder} variant="outline" >
         {sortOrder === 'asc' ? 'Ordre croissant' : 'Ordre décroissant'}
       </Button>
     );
@@ -405,8 +444,8 @@ function VenteRefresh() {
   
 
   // ok ajoutons venteList comme gpt est bète là
-  function VenteList({actions}) {
-    const {  ventes,  filters } = useContext(VenteContext);
+  function VenteList({ actions }) {
+    const { ventes, filters } = useContext(VenteContext);
   
     return (
       <Table variant="simple">
@@ -422,10 +461,17 @@ function VenteRefresh() {
         <Tbody>
           {ventes.map((vente) => (
             <Tr key={vente._id}>
-              <Td>{new Date(vente.dateVente).toLocaleDateString()} </Td>
-              <Td>{highlightSearchTerm(vente.clientNonEnregistre?.nom ? vente.clientNonEnregistre.nom : vente.client.name, filters.searchTerm||'')}</Td>
-              <Td>{highlightSearchTerm(vente.montantTotal, filters.searchTerm || "")}</Td>
-              <Td>{highlightSearchTerm(vente.statutPaiement, filters.searchTerm || "")}</Td>
+              <Td>{new Date(vente.dateVente).toLocaleDateString()}</Td>
+              <Td>
+                {highlightSearchTerm(
+                  vente.clientNonEnregistre?.nom
+                    ? vente.clientNonEnregistre.nom
+                    : vente.client.name,
+                  filters.searchTerm || ''
+                )}
+              </Td>
+              <Td>{vente.montantTotal}</Td>
+              <Td>{vente.statutPaiement}</Td>
               <Td>
                 <Menu>
                   <MenuButton as={IconButton} icon={<ChevronDownIcon />} />
@@ -444,6 +490,7 @@ function VenteRefresh() {
       </Table>
     );
   }
+  
 
   
 
@@ -451,36 +498,37 @@ function VenteRefresh() {
   function VentePagination() {
     const { currentPage, setCurrentPage, totalVentes, itemsPerPage } = useContext(VenteContext);
   
-    const totalPages = Math.ceil(totalVentes / itemsPerPage);
+    // Calculer le nombre total de pages
+    const totalPages = Math.max(Math.ceil(totalVentes / itemsPerPage), 1);
   
-    const [show, setShow] = useState(true)
-  
-    useEffect(()=>{
+    // Mettre à jour la page courante si elle dépasse le nombre total de pages
+    useEffect(() => {
       if (currentPage > totalPages) {
-        setCurrentPage(1);
+        setCurrentPage(totalPages);
       }
-      if (totalVentes <= itemsPerPage) {
-        setShow(false);
-      }else{
-        setShow(true)
-      }
+    }, [currentPage, totalPages, setCurrentPage]);
   
-    },[totalVentes])
+    // Désactiver les boutons si la pagination n'est pas nécessaire
+    const isPrevDisabled = currentPage <= 1;
+    const isNextDisabled = currentPage >= totalPages || totalVentes === 0;
   
     return (
-      show && <div>
-        <Button onClick={() => setCurrentPage(currentPage - 1)} isDisabled={currentPage === 1}>
-          Précédent
-        </Button>
-        <span>
-          Page {currentPage} sur {totalPages}
-        </span>
-        <Button onClick={() => setCurrentPage(currentPage + 1)} isDisabled={currentPage === totalPages}>
-          Suivant
-        </Button>
-      </div>
+      totalVentes > itemsPerPage && (
+        <div>
+          <Button onClick={() => setCurrentPage(currentPage - 1)} isDisabled={isPrevDisabled}>
+            Précédent
+          </Button>
+          <span>
+            Page {currentPage} sur {totalPages}
+          </span>
+          <Button onClick={() => setCurrentPage(currentPage + 1)} isDisabled={isNextDisabled}>
+            Suivant
+          </Button>
+        </div>
+      )
     );
   }
+  
 
   // Composant VenteNumber qui affiche le nombre de montures affichées
 function VenteNumber() {
