@@ -11,7 +11,7 @@ const VenteContext = createContext(null);
 
 
 // Fonction pour mettre en gras les caractères recherchés
-const highlightSearchTerm = (text, term) => {
+const highlightSearchTerm = (text ='', term) => {
     if (!term) return text;
     const regex = new RegExp(`(${term})`, 'gi');
     return text.split(regex).map((part, index) => 
@@ -61,7 +61,7 @@ function VenteZone({ r,api, user, onPrintFacture, children }) {
   const [ordonnances, setOrdonnances] = useState([]);
   const [montures, setMontures] = useState([]);
   const [filteredVentes, setFilteredVentes] = useState([]);
-  const [filters, setFilters] = useState({});
+  const [filters, setFilters] = useState({searchTerm:""});
   const [sortOrder, setSortOrder] = useState('desc'); // 'asc' or 'desc'
   const [sortKey, setSortKey] = useState('dateVente'); // Default sort by date
   const [process, setProcess] = useState({ error: null, success: null, loading: false });
@@ -168,7 +168,7 @@ function VenteZone({ r,api, user, onPrintFacture, children }) {
     sortOrder, // Utilisé dans VenteOrder pour ordonner croissant/décroissant
     setSortOrder, // Utilisé dans VenteOrder pour modifier l'ordre de tri
     onPrintFacture, // Utilisé dans VenteList pour imprimer une facture spécifique
-    user, // Utilisé dans VenteForm pour des actions spécifiques à l'utilisateur
+    user, // utilisé dans le future pour ajouter celui qui créait la facture 
     api, // Utilisé pour les appels API dans VenteCreatorButton et VenteList
     refresh, // pour actualiser
     process, // le process
@@ -406,7 +406,7 @@ function VenteRefresh() {
 
   // ok ajoutons venteList comme gpt est bète là
   function VenteList({actions}) {
-    const {  ventes,  searchTerm, filters } = useContext(VenteContext);
+    const {  ventes,  filters } = useContext(VenteContext);
   
     return (
       <Table variant="simple">
@@ -423,9 +423,9 @@ function VenteRefresh() {
           {ventes.map((vente) => (
             <Tr key={vente._id}>
               <Td>{new Date(vente.dateVente).toLocaleDateString()} </Td>
-              <Td>{highlightSearchTerm(vente.clientNonEnregistre ? vente.clientNonEnregistre.nom : vente.client.name, filters.searchTerm)}</Td>
-              <Td>{highlightSearchTerm(vente.montantTotal, filters.searchTerm)}</Td>
-              <Td>{highlightSearchTerm(vente.statutPaiement, searchTerm)}</Td>
+              <Td>{highlightSearchTerm(vente.clientNonEnregistre?.nom ? vente.clientNonEnregistre.nom : vente.client.name, filters.searchTerm||'')}</Td>
+              <Td>{highlightSearchTerm(vente.montantTotal, filters.searchTerm || "")}</Td>
+              <Td>{highlightSearchTerm(vente.statutPaiement, filters.searchTerm || "")}</Td>
               <Td>
                 <Menu>
                   <MenuButton as={IconButton} icon={<ChevronDownIcon />} />

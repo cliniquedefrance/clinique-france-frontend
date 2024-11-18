@@ -308,6 +308,10 @@ function VentePage() {
           action: (vente)=> window.alert(`Impr vente \n ${JSON.stringify(vente)}`)
   
       },
+      {
+        label:"Voir JSON",
+        action : (vente) => window.alert(JSON.stringify(vente, null, 2))
+      }
    ]
   
 
