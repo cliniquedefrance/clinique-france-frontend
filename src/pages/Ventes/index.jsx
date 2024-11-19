@@ -1,13 +1,14 @@
 /* eslint-disable react/jsx-no-bind */
 import React, { useEffect, useState }  from 'react';
 import { Box, VStack, Heading, Divider, HStack, Button } from '@chakra-ui/react';
-import { VenteFilter, VenteList, VenteNumber, VenteOrder, VentePagination, VenteRefresh, VenteSearch, VenteZone } from './VenteZone/VenteComponnents';
+import { VenteList, VenteNumber, VenteOrder, VentePagination, VenteRefresh, VenteSearch, VenteZone } from './VenteZone/VenteComponnents';
 import DeleteRessourceDialogue from '../../components/Ressource/DeleteRessource';
 import VenteForm from './VenteZone/VenteForm';
 import { CREATE_MODE, UPDATE_MODE } from './VenteZone/constants';
 import { creerVente, mettreAJourVente, obtenirToutesLesVentes, supprimerVente } from './vente.api';
 import { getAllOrdonnances } from '../PatientPages/Manage/ordonnance.api';
 import { getAllMontures } from '../Catalogue/Montures/monture.api';
+import VenteFilter from './VenteZone/VenteFilter';
 
 // const testVentesData = [
 //     {

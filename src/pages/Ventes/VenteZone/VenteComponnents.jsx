@@ -1,6 +1,6 @@
 /* eslint-disable consistent-return */
 import React, { createContext, useState, useEffect, useMemo, useCallback, useContext } from 'react';
-import { Alert, AlertDescription, AlertIcon, AlertTitle,  Button, HStack, IconButton, Input, List, ListItem, Menu, MenuButton, MenuItem, MenuList, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Select, Spinner, Table, Tbody, Td, Text, Th, Thead, Tr } from '@chakra-ui/react';
+import { Alert, AlertDescription, AlertIcon, AlertTitle,  Button,   IconButton, Input, List, ListItem, Menu, MenuButton, MenuItem, MenuList, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Select, Spinner, Table, Tbody, Td, Text, Th, Thead, Tr} from '@chakra-ui/react';
 import { LuRefreshCcw } from 'react-icons/lu';
 import { ChevronDownIcon } from '@chakra-ui/icons';
 
@@ -63,9 +63,15 @@ function VenteState({ process, retryFunction, setProcess }) {
     const [ordonnances, setOrdonnances] = useState([]);
     const [montures, setMontures] = useState([]);
     const [filteredVentes, setFilteredVentes] = useState([]);
-    const [filters, setFilters] = useState({ searchTerm: "", status: "", clientType: "", saleDate: "" });
-    const [sortOrder, setSortOrder] = useState('desc'); // 'asc' or 'desc'
-    const [sortKey, setSortKey] = useState('dateVente'); // Default sort by date
+    const [filters, setFilters] = useState({
+      searchTerm: "",
+      status: "",
+      clientType: "",
+      saleDate: "",
+      dateRange: { startDate: "", endDate: "" }, // Ajout pour le filtrage par période
+    });
+    const [sortOrder, setSortOrder] = useState("desc");
+    const [sortKey, setSortKey] = useState("dateVente");
     const [process, setProcess] = useState({ error: null, success: null, loading: false });
   
     const [currentPage, setCurrentPage] = useState(1);
@@ -77,9 +83,9 @@ function VenteState({ process, retryFunction, setProcess }) {
         setProcess({ ...process, loading: true });
         const data = await api.getVentes();
         setVentes(data);
-        setProcess({ error: null, success: 'Ventes chargées avec succès', loading: false });
+        setProcess({ error: null, success: "Ventes chargées avec succès", loading: false });
       } catch (error) {
-        setProcess({ error: 'Erreur lors du chargement des Ventes', success: null, loading: false });
+        setProcess({ error: "Erreur lors du chargement des Ventes", success: null, loading: false });
       }
     };
   
@@ -88,7 +94,7 @@ function VenteState({ process, retryFunction, setProcess }) {
         const data = await api.getOrdonnances();
         setOrdonnances(data);
       } catch (error) {
-        setProcess({ error: 'Erreur lors du chargement des Ordonnances', success: null, loading: false });
+        setProcess({ error: "Erreur lors du chargement des Ordonnances", success: null, loading: false });
       }
     };
   
@@ -97,7 +103,7 @@ function VenteState({ process, retryFunction, setProcess }) {
         const data = await api.getMontures();
         setMontures(data);
       } catch (error) {
-        setProcess({ error: 'Erreur lors du chargement des Montures', success: null, loading: false });
+        setProcess({ error: "Erreur lors du chargement des Montures", success: null, loading: false });
       }
     };
   
@@ -117,16 +123,16 @@ function VenteState({ process, retryFunction, setProcess }) {
     const applyFiltersAndSorting = useCallback(() => {
       let result = [...ventes];
   
-      // Filtrage
+      // Filtrage par recherche
       if (filters.searchTerm) {
         const search = filters.searchTerm.toLowerCase();
         result = result.filter((vente) => {
-          const clientName = vente.client?.name?.toLowerCase() || '';
-          const clientNonEnregistreName = vente.clientNonEnregistre?.nom?.toLowerCase() || '';
+          const clientName = vente.client?.name?.toLowerCase() || "";
+          const clientNonEnregistreName = vente.clientNonEnregistre?.nom?.toLowerCase() || "";
   
-          const articleMatch = vente.articles.some(article => {
-            const brand = article.monture?.brand?.toLowerCase() || '';
-            const model = article.monture?.model?.toLowerCase() || '';
+          const articleMatch = vente.articles.some((article) => {
+            const brand = article.monture?.brand?.toLowerCase() || "";
+            const model = article.monture?.model?.toLowerCase() || "";
             return brand.includes(search) || model.includes(search);
           });
   
@@ -134,16 +140,51 @@ function VenteState({ process, retryFunction, setProcess }) {
         });
       }
   
+      // Filtrage par statut de paiement
+      if (filters.status) {
+        result = result.filter((vente) => vente.statutPaiement === filters.status);
+      }
+  
+      // Filtrage par type de client
+      if (filters.clientType) {
+        if (filters.clientType === "patient") {
+          result = result.filter((vente) => vente.client?._id);
+        } else if (filters.clientType === "nonEnregistre") {
+          result = result.filter((vente) => vente.clientNonEnregistre?.nom);
+        }
+      }
+  
+      // Filtrage par date de vente exacte
+      if (filters.saleDate) {
+        
+        result = result.filter((vente) => {
+          const venteDate = vente.dateVente.split("T")[0]; // Récupérer uniquement la partie "YYYY-MM-DD"
+     return venteDate === filters.saleDate;
+
+        });
+      }
+  
+      // Filtrage par période (dateRange)
+      const { startDate, endDate } = filters.dateRange;
+      if (startDate || endDate) {
+        result = result.filter((vente) => {
+          const venteDate = new Date(vente.dateVente);
+          if (startDate && venteDate < new Date(startDate)) return false;
+          if (endDate && venteDate > new Date(endDate)) return false;
+          return true;
+        });
+      }
+  
       // Tri
       result.sort((a, b) => {
-        const aValue = a[sortKey] ?? '';
-        const bValue = b[sortKey] ?? '';
+        const aValue = a[sortKey] ?? "";
+        const bValue = b[sortKey] ?? "";
   
-        if (typeof aValue === 'string' && typeof bValue === 'string') {
-          return sortOrder === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+        if (typeof aValue === "string" && typeof bValue === "string") {
+          return sortOrder === "asc" ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
         }
   
-        return sortOrder === 'asc' ? aValue - bValue : bValue - aValue;
+        return sortOrder === "asc" ? aValue - bValue : bValue - aValue;
       });
   
       setFilteredVentes(result);
@@ -155,49 +196,60 @@ function VenteState({ process, retryFunction, setProcess }) {
       return filteredVentes.slice(startIndex, startIndex + itemsPerPage);
     }, [filteredVentes, currentPage, itemsPerPage]);
   
-    // Appliquer le filtrage et le tri à chaque modification des filtres ou du tri
     useEffect(() => {
       applyFiltersAndSorting();
     }, [filters, sortKey, sortOrder, ventes, applyFiltersAndSorting]);
   
-    const value = useMemo(() => ({
-      ventes: paginatedVentes,
-      filteredVentes,
-      ordonnances,
-      montures,
-      filters,
-      setFilters,
-      sortKey,
-      setSortKey,
-      sortOrder,
-      setSortOrder,
-      onPrintFacture,
-      user,
-      api,
-      refresh,
-      process,
-      setProcess,
-      setCurrentPage,
-      setItemsPerPage,
-      itemsPerPage,
-      totalVentes: filteredVentes.length,
-      inOtherPage,
-      currentPage,
-    }), [
-      paginatedVentes, filteredVentes, ordonnances, montures,
-      filters, sortKey, sortOrder, onPrintFacture,
-      process, user, api, currentPage, itemsPerPage
-    ]);
+    const value = useMemo(
+      () => ({
+        ventes: paginatedVentes,
+        filteredVentes,
+        ordonnances,
+        montures,
+        filters,
+        setFilters,
+        sortKey,
+        setSortKey,
+        sortOrder,
+        setSortOrder,
+        onPrintFacture,
+        user,
+        api,
+        refresh,
+        process,
+        setProcess,
+        setCurrentPage,
+        setItemsPerPage,
+        itemsPerPage,
+        totalVentes: filteredVentes.length,
+        inOtherPage,
+        currentPage,
+      }),
+      [
+        paginatedVentes,
+        filteredVentes,
+        ordonnances,
+        montures,
+        filters,
+        sortKey,
+        sortOrder,
+        onPrintFacture,
+        process,
+        user,
+        api,
+        currentPage,
+        itemsPerPage,
+      ]
+    );
   
     return (
       <VenteContext.Provider value={value}>
-        {!inOtherPage && (
-          <VenteState process={process} setProcess={setProcess} retryFunction={refresh} />
-        )}
+        {!inOtherPage && <VenteState process={process} setProcess={setProcess} retryFunction={refresh} />}
         {children}
       </VenteContext.Provider>
     );
   }
+  
   
 
 
@@ -334,71 +386,118 @@ function VenteSearch() {
 
   // VenteFilter 
 
-  function VenteFilter() {
-    const { filters, setFilters } = useContext(VenteContext);
+  // function VenteFilter({ showUniqueDatePicker = false, showClientType = false }) {
+  //   const { filters, setFilters } = useContext(VenteContext);
   
-    const handleStatusChange = (e) => {
-      const status = e.target.value;
-      setFilters((prevFilters) => ({
-        ...prevFilters,
-        status,
-      }));
-    };
+  //   const handleStatusChange = (e) => {
+  //     const status = e.target.value;
+  //     setFilters((prevFilters) => ({
+  //       ...prevFilters,
+  //       status,
+  //     }));
+  //   };
   
-    const handleClientTypeChange = (e) => {
-      const clientType = e.target.value;
-      setFilters((prevFilters) => ({
-        ...prevFilters,
-        clientType,
-      }));
-    };
+  //   const handleClientTypeChange = (e) => {
+  //     const clientType = e.target.value;
+  //     setFilters((prevFilters) => ({
+  //       ...prevFilters,
+  //       clientType,
+  //     }));
+  //   };
   
-    const handleDateChange = (e) => {
-      const saleDate = e.target.value;
-      setFilters((prevFilters) => ({
-        ...prevFilters,
-        saleDate,
-      }));
-    };
+  //   const handleDateChange = (e) => {
+  //     const saleDate = e.target.value;
+  //     setFilters((prevFilters) => ({
+  //       ...prevFilters,
+  //       saleDate,
+  //     }));
+  //   };
   
-    // Debugging pour voir les changements dans les filtres
-    useEffect(() => {
-      console.log("Filtres mis à jour :", filters);
-    }, [filters]);
+  //   const handleDateRangeChange = (key, value) => {
+  //     setFilters((prevFilters) => ({
+  //       ...prevFilters,
+  //       dateRange: {
+  //         ...prevFilters.dateRange,
+  //         [key]: value,
+  //       },
+  //     }));
+  //   };
   
-    return (
-      <HStack spacing={4} mb={4}>
-        {/* Filtrer par statut */}
-        <Select
-          placeholder="Statut de paiement"
-          onChange={handleStatusChange}
-          value={filters.status || ""}
-        >
-          <option value="payé">Payé</option>
-          <option value="partiel">Partiel</option>
-          <option value="impayé">Impayé</option>
-        </Select>
+  //   return (
+  //     <Wrap
+  //       spacing={4}
+  //       align="center"
+  //       justify="space-between"
+  //       w="100%"
+  //       p={4}
+  //       bg="gray.50"
+  //       borderRadius="md"
+  //       boxShadow="sm"
+  //     >
+  //       {/* Filtrer par statut */}
+  //       <FormControl w={{ base: "100%", md: "auto" }} flex="1">
+  //         <FormLabel>Statut de paiement</FormLabel>
+  //         <Select
+  //           placeholder="Sélectionner un statut"
+  //           onChange={handleStatusChange}
+  //           value={filters.status || ""}
+  //         >
+  //           <option value="payé">Payé</option>
+  //           <option value="partiel">Partiel</option>
+  //           <option value="impayé">Impayé</option>
+  //         </Select>
+  //       </FormControl>
   
-        {/* Filtrer par type de client */}
-        <Select
-          placeholder="Type de client"
-          onChange={handleClientTypeChange}
-          value={filters.clientType || ""}
-        >
-          <option value="patient">Patient enregistré</option>
-          <option value="nonEnregistre">Client non enregistré</option>
-        </Select>
+  //       {/* Filtrer par type de client */}
+  //       {showClientType && (
+  //         <FormControl w={{ base: "100%", md: "auto" }} flex="1">
+  //           <FormLabel>Type de client</FormLabel>
+  //           <Select
+  //             placeholder="Sélectionner un type de client"
+  //             onChange={handleClientTypeChange}
+  //             value={filters.clientType || ""}
+  //           >
+  //             <option value="patient">Patient enregistré</option>
+  //             <option value="nonEnregistre">Client non enregistré</option>
+  //           </Select>
+  //         </FormControl>
+  //       )}
   
-        {/* Filtrer par date de vente */}
-        <Input
-          type="date"
-          placeholder="Date de vente"
-          onChange={handleDateChange}
-          value={filters.saleDate || ""}
-        />
-      </HStack>
-    );
-  }
+  //       {/* Filtrer par date exacte */}
+  //       {showUniqueDatePicker && (
+  //         <FormControl w={{ base: "100%", md: "auto" }} flex="1">
+  //           <FormLabel>Date de vente exacte</FormLabel>
+  //           <Input
+  //             type="date"
+  //             onChange={handleDateChange}
+  //             value={filters.saleDate || ""}
+  //           />
+  //         </FormControl>
+  //       )}
+  
+  //       {/* Filtrer par période */}
+  //       <FormControl w={{ base: "100%", md: "auto" }} flex="1">
+  //         <FormLabel>Date de début</FormLabel>
+  //         <Input
+  //           type="date"
+  //           onChange={(e) => handleDateRangeChange("startDate", e.target.value)}
+  //           value={filters.dateRange?.startDate || ""}
+  //         />
+  //       </FormControl>
+  //       <FormControl w={{ base: "100%", md: "auto" }} flex="1">
+  //         <FormLabel>Date de fin</FormLabel>
+  //         <Input
+  //           type="date"
+  //           onChange={(e) => handleDateRangeChange("endDate", e.target.value)}
+  //           value={filters.dateRange?.endDate || ""}
+  //         />
+  //       </FormControl>
+  //     </Wrap>
+  //   );
+  // }
+  
+  
+  
   
   
 
@@ -543,7 +642,7 @@ export {
     VenteSearch , 
     SearchOrdonnance, 
     SearchMonture, 
-    VenteFilter, 
+    // VenteFilter, 
     VenteSorter , 
     VenteOrder,
     VenteRefresh,

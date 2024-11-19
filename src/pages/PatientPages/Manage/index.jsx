@@ -27,8 +27,9 @@ import DeleteRessourceDialogue from '../../../components/Ressource/DeleteRessour
 import { CREATE_MODE, ORDONNANCE_OPHTA_TO_PRINT, ORDONNANCE_RESSOURCE, UPDATE_MODE, VIEW_MODE } from './constants';
 import VenteForm from '../../Ventes/VenteZone/VenteForm';
 import { creerVente, obtenirToutesLesVentes } from '../../Ventes/vente.api';
-import { VenteFilter, VenteList, VentePagination,  VenteZone } from '../../Ventes/VenteZone/VenteComponnents';
+import { VenteList, VentePagination,  VenteZone } from '../../Ventes/VenteZone/VenteComponnents';
 import { getAllMontures } from '../../Catalogue/Montures/monture.api';
+import VenteFilter from '../../Ventes/VenteZone/VenteFilter';
 
 const api = {
   getVentes: obtenirToutesLesVentes,
@@ -506,7 +507,7 @@ function ManagePatient() {
          Ventes du patient
       </Heading>
                 <VenteZone r={refreshPatientVenteList}  api={patientVenteApi}>
-                  <VenteFilter/>
+                  <VenteFilter showClientType={false}/>
                   <Divider mt={4} mb={4} />
                   <VenteList actions={actions}/>
                   <Divider mt={4} mb={4} />
