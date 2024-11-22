@@ -387,8 +387,8 @@ function ManagePatient() {
 
     // },
     {
-        label: "imprimer facture",
-        action: (vente)=> window.alert(`Impr vente \n ${JSON.stringify(vente)}`)
+        label: "imprimer Proforma",
+        action: (vente)=> navigate(`/print/vente-proforma/${vente._id}`),
 
     },
     {
