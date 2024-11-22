@@ -1,10 +1,134 @@
+/* eslint-disable no-unused-vars */
 import { Document, Image, Page, PDFViewer, StyleSheet, Text, View } from '@react-pdf/renderer'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
+import { Spinner } from '@chakra-ui/react'
 import Logo from '../../../assets/images/icone 512-100.jpg'
 import Location from '../../../assets/images/location-dot-solid.png'
 import Phone from '../../../assets/images/phone.png'
 import Globe from '../../../assets/images/globe.png'
 import Envelop from '../../../assets/images/envelop.png'
+import { obtenirVenteParId } from '../vente.api' // A utiliser lorsque les tests seront fonctionnel
+
+// #region Pour Tester
+
+/* pour les champs Variables qui apparaissent dans la proforma et qui ne sont pas encore disponibles
+  (comme le nom du docteur ou la date d'expiration )
+   il faudra utiliser un affichage conditionnel
+*/
+
+/**
+ * Récupère une vente simulée pour les tests après un délai de 3 secondes.
+ * @param {string} id - L'identifiant que l'on souhaite donner à la vente (utile pour les tests sur les rapports...).
+ * @param {boolean} complet - Si la vente doit inclure une ordonnance ou pas.
+ * @returns {Promise<Object|null>} - Une promesse résolue avec la vente simulée après un délai.
+ */
+function getVente(id = "1", complet = true) {
+    // Jeux de données simulés pour les montures
+    const montures = {
+      monture1: {
+        _id: "monture1",
+        brand: "Ray-Ban",
+        model: "RB3016 Clubmaster",
+        quantity: 5,
+        isInStock: true,
+      },
+      monture2: {
+        _id: "monture2",
+        brand: "Oakley",
+        model: "OX8046 Holbrook",
+        quantity: 10,
+        isInStock: true,
+      },
+      monture3: {
+        _id: "monture3",
+        brand: "Gucci",
+        model: "GG0028O",
+        image: {
+          url: "https://example.com/images/monture3.jpg",
+          altText: "Gucci GG0028O",
+        },
+        quantity: 0,
+        isInStock: false,
+      },
+    };
+  
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        if (complet) {
+          resolve({
+            _id: id,
+            client: {
+              _id: "patient1",
+              name: "Donald Tromp",
+              email: "donaldotrumpo@outlook.us",
+            },
+            articles: [
+              {
+                monture: montures.monture1,
+                quantite: 1,
+                prixUnitaire: 100,
+                remise: 10,
+              },
+              {
+                monture: montures.monture2,
+                quantite: 2,
+                prixUnitaire: 80,
+                remise: 5,
+              },
+            ],
+            ordonnance: {
+              _id: "ordonnance1",
+              date: "2024-11-20",
+              oeilDroit: { SPH: "-2.00", CYL: "-0.50" },
+              oeilGauche: { SPH: "-1.50", CYL: "-0.75" },
+              traitements: ["Anti-reflet"],
+            },
+            ordonnancePrixOD: 50,
+            ordonnancePrixOG: 60,
+            montantTotal: 370, 
+            montantPaye: 100,
+            resteAPayer: 270,
+            dateVente: "2024-11-21",
+            statutPaiement: "partiel",
+          });
+        } else {
+          resolve({
+            _id: id,
+            clientNonEnregistre: {
+              nom: "Balboa Felix",
+              contact: "0123456899",
+            },
+            articles: [
+              {
+                monture: montures.monture2,
+                quantite: 1,
+                prixUnitaire: 80,
+                remise: 0,
+              },
+              {
+                monture: montures.monture3,
+                quantite: 3,
+                prixUnitaire: 150,
+                remise: 20,
+              },
+            ],
+            montantTotal: 510, 
+            montantPaye: 510,
+            resteAPayer: 0,
+            dateVente: "2024-11-21",
+            statutPaiement: "payé",
+          });
+        }
+      }, 3000);
+    });
+  }
+  
+  
+  
+
+// #endregion
+
 
 const styles = StyleSheet.create({
   bigPage: {
@@ -97,11 +221,68 @@ const styles = StyleSheet.create({
 
 export default function Proformat(){
 
+    const { id } = useParams();
+    const [vente, setVente] = useState(null);
+    const [client, setClient] = useState(null);
+    const [ordonnance, setOrdonnance] = useState(null)
+    const [error, setError] = useState(null);
+    const [loading, setLoading] = useState(false);
+  
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+          setLoading(true);
+          const venteData = await getVente(id, true);
+          console.log('Vente récupérée : ',venteData);
+          if (venteData) {
+            setVente(venteData);
+            if(venteData.client?._id){ // si la vente concerne un patient
+                setOrdonnance(venteData.ordonnance); // il y'a une ordonnance
+                setClient(venteData.client); // et les données du patient sont dans client
+                setError(null);
+            }else if(vente?.clientNonEnregistre) { // si la vente ne concerne pas directement un patient,
+                setOrdonnance(null);  //  alors il n'ya pas d'ordonnance 
+                setClient(vente.clientNonEnregistre); // le champ clientNonEnregistre a les propriétés nom et contact
+                setError(null);
+            }else{
+                setError("Client Non Reconnu")
+            }
+            setError(null);
+          } else {
+            setError("Erreur lors de la récupération des données");
+          }
+        } catch (_err) {
+          setError("Erreur non reconnue");
+          console.error(_err);
+        } finally {
+          setLoading(false);
+        }
+      };
+  
+      fetchData();
+    }, [id]);
+  
+    if (error) {
+      return (
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", minWidth: "100vw" }}>
+          <p style={{ color: "red" }}>{error}</p>
+        </div>
+      );
+    }
+  
+    if (loading && !error) {
+      return (
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", minWidth: "100vw" }}>
+          <Spinner />
+        </div>
+      );
+    }
+  
    
 
     return (
         <PDFViewer>
-      <Document title="Ordonnance-opht" author='Gateway force' >
+      <Document title="Proforma-opht" author='Gateway force' >
         <Page size='A4' style={styles.bigPage} orientation="portrait">
           <View style={[styles.page, {opacity: 0.5, flexDirection: 'row', alignItems: 'center'}]}>
             {/* Background Image */}

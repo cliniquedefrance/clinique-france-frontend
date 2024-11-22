@@ -1,5 +1,6 @@
 /* eslint-disable react/jsx-no-bind */
 import React, { useEffect, useState }  from 'react';
+import {  useNavigate } from 'react-router-dom';
 import { Box, VStack, Heading, Divider, HStack, Button } from '@chakra-ui/react';
 import { VenteList, VenteNumber, VenteOrder, VentePagination, VenteRefresh, VenteSearch, VenteZone } from './VenteZone/VenteComponnents';
 import DeleteRessourceDialogue from '../../components/Ressource/DeleteRessource';
@@ -9,6 +10,7 @@ import { creerVente, mettreAJourVente, obtenirToutesLesVentes, supprimerVente } 
 import { getAllOrdonnances } from '../PatientPages/Manage/ordonnance.api';
 import { getAllMontures } from '../Catalogue/Montures/monture.api';
 import VenteFilter from './VenteZone/VenteFilter';
+
 
 // const testVentesData = [
 //     {
@@ -180,6 +182,8 @@ const api = {
 
 function VentePage() {
 
+const navigate = useNavigate()
+
     const [confirmDel, setConfirmDel] = useState(false);
     const [venteToDel, setVenteToDel] = useState(null);
     const [mode, setMode] = useState(CREATE_MODE);
@@ -305,8 +309,8 @@ function VentePage() {
   
       },
       {
-          label: "imprimer facture",
-          action: (vente)=> window.alert(`Impr vente \n ${JSON.stringify(vente)}`)
+          label: "imprimer Proforma",
+          action: (vente)=> navigate(`/print/vente-proforma/${vente._id}`),
   
       },
       {

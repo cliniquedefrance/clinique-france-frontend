@@ -40,7 +40,7 @@ function Routeur() {
         <Route path="/content/*" element={ <ContentRouter />} />
         <Route path="/print-pdf" element={<AppointmentPDF />} />
         <Route path="/print/ordonnance-ophta/:id?" element={<OrdonnanceOphtaPDF />} />
-        <Route path="/print/vente-proforma" element={<Proformat />}/>
+        <Route path="/print/vente-proforma/:id?" element={<Proformat />}/>
       </Routes>
     </BrowserRouter>
   );
