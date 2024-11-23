@@ -1,3 +1,4 @@
+/* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable no-unused-vars */
 import { Document, Image, Page, PDFViewer, StyleSheet, Text, View } from '@react-pdf/renderer'
 import React, { useEffect, useState } from 'react'
@@ -62,6 +63,7 @@ function getVente(id = "1", complet = true) {
               _id: "patient1",
               name: "Donald Tromp",
               email: "donaldotrumpo@outlook.us",
+              telephone: "697852712",
             },
             articles: [
               {
@@ -232,7 +234,7 @@ export default function Proformat(){
       const fetchData = async () => {
         try {
           setLoading(true);
-          const venteData = await getVente(id, true);
+          const venteData = await obtenirVenteParId(id);
           console.log('Vente récupérée : ',venteData);
           if (venteData) {
             setVente(venteData);
@@ -278,6 +280,7 @@ export default function Proformat(){
       );
     }
   
+    const isPatient = !!ordonnance;
    
 
     return (
@@ -314,19 +317,19 @@ export default function Proformat(){
                 <View style={{border: '2px solid black', marginTop: -1, width: 220}}>
                     <View style={{marginBottom: 15, flexDirection: 'row'}}>
                         <Text style={{width: 80}}>Patient</Text>
-                        <Text style={{flex: 1}}>Mme TINA MEREILLE</Text>
+                        <Text style={{flex: 1}}>{ `${client?.name  }${  client?.surname}`}</Text>
                     </View>
                     <View style={{marginBottom: 4, flexDirection: 'row'}}>
                         <Text style={{width: 80}}>Téléphone</Text>
-                        <Text style={{flex: 1}}>600000000</Text>
+                        <Text style={{flex: 1}}>{client?.telephone}</Text>
                     </View>
                     <View style={{marginBottom: 4, flexDirection: 'row'}}>
                         <Text style={{width: 80}}>Médecin</Text>
-                        <Text style={{flex: 1}}>Dr BIMBAI STEPHANE C.</Text>
+                        <Text style={{flex: 1}}>{ordonnance?.ophtamologue?.name || "N/A"}</Text>
                     </View>
                     <View style={{marginBottom: 4, flexDirection: 'row'}}>
                         <Text style={{width: 80}}>Date prescription</Text>
-                        <Text style={{flex: 1}}>08/11/2024</Text>
+                        <Text style={{flex: 1}}>{ordonnance?.createdAt}</Text>
                     </View>
                 </View>
 
@@ -335,7 +338,7 @@ export default function Proformat(){
                 <View style={{border: '2px solid black', marginTop: -1, paddingRight: 40}}>
                     <View style={{flexDirection: 'row'}}>
                         <Text style={{width: 60, padding: 2}}>Docteur</Text>
-                        <Text style={{width: 125, padding: 2}}>Dr BIMBAI STEPHANE C.</Text>
+                        <Text style={{width: 125, padding: 2}}>{ordonnance?.ophtamologue?.name || "N/A"}</Text>
                         <Text style={styles.cell}>OEIL</Text>
                         <Text style={styles.cell}>Sphére</Text>
                         <Text style={styles.cell}>Cylindre</Text>
@@ -346,19 +349,19 @@ export default function Proformat(){
                         <Text style={{width: 60, padding: 2}}>Rx date</Text>
                         <Text style={{width: 125, padding: 2}}>08/11/2024</Text>
                         <Text style={[styles.cell, {fontWeight: 'bold'}]}>OD</Text>
-                        <Text style={styles.cell}>+0,50</Text>
-                        <Text style={styles.cell}>-0,75</Text>
-                        <Text style={styles.cell}>60</Text>
-                        <Text style={styles.cell}>+1.75</Text>
+                        <Text style={styles.cell}>{ordonnance?.oeilDroit?.SPH}</Text>
+                        <Text style={styles.cell}>{ordonnance?.oeilDroit?.CYL}</Text>
+                        <Text style={styles.cell}>{ordonnance?.oeilDroit?.AXE}</Text>
+                        <Text style={styles.cell}>{ordonnance?.oeilDroit?.ADD}</Text>
                     </View>
                     <View style={{flexDirection: 'row'}}>
                         <Text style={{width: 60, padding: 2}}>Rx Expired</Text>
                         <Text style={{width: 125, padding: 2}}>07/11/2025</Text>
                         <Text style={styles.cell}>OG</Text>
-                        <Text style={styles.cell}>+0,25</Text>
-                        <Text style={styles.cell}>-0,25</Text>
-                        <Text style={styles.cell}>50</Text>
-                        <Text style={styles.cell}>+1,75</Text>
+                        <Text style={styles.cell}>{ordonnance?.oeilGauche?.SPH}</Text>
+                        <Text style={styles.cell}>{ordonnance?.oeilGauche?.CYL}</Text>
+                        <Text style={styles.cell}>{ordonnance?.oeilGauche?.AXE}</Text>
+                        <Text style={styles.cell}>{ordonnance?.oeilGauche?.ADD}</Text>
                     </View>
                 </View>
 
@@ -375,41 +378,51 @@ export default function Proformat(){
                     <View style={{border: '2px solid black', marginTop: -1}}>
                         <View style={{borderBottom: '1px solid black', padding: '2 2 0 2'}}>
                             <Text style={{fontWeight: 'bold', paddingBottom: 15}}>Montures</Text>
-                            <View style={{flexDirection: 'row', width: '100%', alignItems: 'center'}}>
+                            {vente?.articles?.map(article => (
+                                <View style={{flexDirection: 'row', width: '100%', alignItems: 'center'}}>
                                 <View style={[styles.cellSpace,{width: '47%'}]}>
-                                    <Text style={{marginBottom: 3}}>BENETTON</Text>
-                                    <Text>BEO1074 281 55/19 140</Text>
+                                    <Text style={{marginBottom: 3}}>{article?.monture?.brand}</Text>
+                                    <Text>{article?.monture?.model}</Text>
                                 </View>
-                                <Text style={{flex: 3}}>1</Text>
-                                <Text style={{flex: 4}}>45000</Text>
-                                <Text style={{flex: 1}}>0</Text>
+                                <Text style={{flex: 3}}>{article?.quantite}</Text>
+                                <Text style={{flex: 4}}>{article?.prixUnitaire}</Text>
+                                <Text style={{flex: 1}}>{article?.remise || 0}</Text>
                                 <View style={{flex: 5, textAlign: 'right'}}>
-                                    <Text style={{marginRight: 30}}>45000</Text>
+                                    <Text style={{marginRight: 30}}>{(article?.quantite * article?.prixUnitaire)-(article?.quantite * article?.prixUnitaire)*(article?.remise||0)/100}</Text>
                                 </View>
                             </View>
+                              ))}
+                            
                             <Text style={{fontWeight: 'bold', paddingVertical: 15}}>Verres</Text>
                             <View style={{flexDirection: 'row', width: '100%', alignItems: 'center'}}>
                                 <View style={[styles.cellSpace,{width: '47%'}]}>
-                                    <Text style={{marginBottom: 3}}><Text style={{fontWeight: 'bold'}}>OD: </Text>PROGRESSIFS PHOTO</Text>
-                                    <Text>ORGANIQUE+AR+BLUE P</Text>
+                                    <Text style={{marginBottom: 3}}><Text style={{fontWeight: 'bold'}}>OD: </Text>
+                                    {
+                                      ordonnance?.traitements?.map(traitement => (<Text>{traitement}</Text>))
+                                    }
+                                    </Text>
+                                   
                                 </View>
                                 <Text style={{flex: 3}}>1</Text>
-                                <Text style={{flex: 4}}>30000</Text>
+                                <Text style={{flex: 4}}>{vente?.ordonnancePrixOD}</Text>
                                 <Text style={{flex: 1}}>0</Text>
                                 <View style={{flex: 5, textAlign: 'right'}}>
-                                    <Text style={{marginRight: 30}}>30000</Text>
+                                    <Text style={{marginRight: 30}}>{vente?.ordonnancePrixOD}</Text>
                                 </View>
                             </View>
                             <View style={{flexDirection: 'row', width: '100%', alignItems: 'center'}}>
                                 <View style={[styles.cellSpace,{width: '47%'}]}>
-                                    <Text style={{marginBottom: 3}}><Text style={{fontWeight: 'bold'}}>OG: </Text>PROGRESSIFS PHOTO</Text>
-                                    <Text>ORGANIQUE+AR+BLUE P</Text>
+                                <Text style={{marginBottom: 3}}><Text style={{fontWeight: 'bold'}}>OG: </Text>
+                                    {
+                                      ordonnance?.traitements?.map(traitement => (<Text>{traitement}</Text>))
+                                    }
+                                    </Text>
                                 </View>
                                 <Text style={{flex: 3}}>1</Text>
-                                <Text style={{flex: 4}}>30000</Text>
+                                <Text style={{flex: 4}}>{vente?.ordonnancePrixOG}</Text>
                                 <Text style={{flex: 1}}>0</Text>
                                 <View style={{flex: 5, textAlign: 'right'}}>
-                                    <Text style={{marginRight: 30}}>30000</Text>
+                                    <Text style={{marginRight: 30}}>{vente?.ordonnancePrixOG}</Text>
                                 </View>
                             </View>
                         </View>
@@ -418,7 +431,7 @@ export default function Proformat(){
                                 <Text style={[styles.detailResultCell,{flex: 3}]}>Total HT</Text>
                                 <Text style={[styles.detailResultCell,{flex: 4}]}> </Text>
                                 <Text style={[styles.detailResultCell,{flex: 1}]}> </Text>
-                                <Text style={[styles.detailResultCell,{flex: 5, textAlign: 'right'}]}>105 000</Text>
+                                <Text style={[styles.detailResultCell,{flex: 5, textAlign: 'right'}]}>{vente?.montantTotal}</Text>
                             </View>
                             <View style={{flexDirection: 'row', margin: 0}}>
                                 <Text style={[styles.detailResultCell,{flex: 3}]}>Remise</Text>
@@ -430,7 +443,7 @@ export default function Proformat(){
                                 <Text style={[styles.detailResultCell,{flex: 3}]}>Net</Text>
                                 <Text style={[styles.detailResultCell,{flex: 4}]}> </Text>
                                 <Text style={[styles.detailResultCell,{flex: 1}]}> </Text>
-                                <Text style={[styles.detailResultCell,{flex: 5, textAlign: 'right'}]}>105 000</Text>
+                                <Text style={[styles.detailResultCell,{flex: 5, textAlign: 'right'}]}>{vente?.montantTotal}</Text>
                             </View>
                         </View>
                     </View>
