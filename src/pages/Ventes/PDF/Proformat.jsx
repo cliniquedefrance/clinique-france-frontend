@@ -3,6 +3,10 @@
 import { Document, Image, Page, PDFViewer, StyleSheet, Text, View } from '@react-pdf/renderer'
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import {NumberToLetter} from '@mandarvl/convertir-nombre-lettre'
+import dayjs from 'dayjs'
+import localizedFormat from "dayjs/plugin/localizedFormat"
+import updateLocale from "dayjs/plugin/updateLocale"
 import { Spinner } from '@chakra-ui/react'
 import Logo from '../../../assets/images/icone 512-100.jpg'
 import Location from '../../../assets/images/location-dot-solid.png'
@@ -10,126 +14,7 @@ import Phone from '../../../assets/images/phone.png'
 import Globe from '../../../assets/images/globe.png'
 import Envelop from '../../../assets/images/envelop.png'
 import { obtenirVenteParId } from '../vente.api' // A utiliser lorsque les tests seront fonctionnel
-
-// #region Pour Tester
-
-/* pour les champs Variables qui apparaissent dans la proforma et qui ne sont pas encore disponibles
-  (comme le nom du docteur ou la date d'expiration )
-   il faudra utiliser un affichage conditionnel
-*/
-
-/**
- * Récupère une vente simulée pour les tests après un délai de 3 secondes.
- * @param {string} id - L'identifiant que l'on souhaite donner à la vente (utile pour les tests sur les rapports...).
- * @param {boolean} complet - Si la vente doit inclure une ordonnance ou pas.
- * @returns {Promise<Object|null>} - Une promesse résolue avec la vente simulée après un délai.
- */
-function getVente(id = "1", complet = true) {
-    // Jeux de données simulés pour les montures
-    const montures = {
-      monture1: {
-        _id: "monture1",
-        brand: "Ray-Ban",
-        model: "RB3016 Clubmaster",
-        quantity: 5,
-        isInStock: true,
-      },
-      monture2: {
-        _id: "monture2",
-        brand: "Oakley",
-        model: "OX8046 Holbrook",
-        quantity: 10,
-        isInStock: true,
-      },
-      monture3: {
-        _id: "monture3",
-        brand: "Gucci",
-        model: "GG0028O",
-        image: {
-          url: "https://example.com/images/monture3.jpg",
-          altText: "Gucci GG0028O",
-        },
-        quantity: 0,
-        isInStock: false,
-      },
-    };
-  
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        if (complet) {
-          resolve({
-            _id: id,
-            client: {
-              _id: "patient1",
-              name: "Donald Tromp",
-              email: "donaldotrumpo@outlook.us",
-              telephone: "697852712",
-            },
-            articles: [
-              {
-                monture: montures.monture1,
-                quantite: 1,
-                prixUnitaire: 100,
-                remise: 10,
-              },
-              {
-                monture: montures.monture2,
-                quantite: 2,
-                prixUnitaire: 80,
-                remise: 5,
-              },
-            ],
-            ordonnance: {
-              _id: "ordonnance1",
-              date: "2024-11-20",
-              oeilDroit: { SPH: "-2.00", CYL: "-0.50" },
-              oeilGauche: { SPH: "-1.50", CYL: "-0.75" },
-              traitements: ["Anti-reflet"],
-            },
-            ordonnancePrixOD: 50,
-            ordonnancePrixOG: 60,
-            montantTotal: 370, 
-            montantPaye: 100,
-            resteAPayer: 270,
-            dateVente: "2024-11-21",
-            statutPaiement: "partiel",
-          });
-        } else {
-          resolve({
-            _id: id,
-            clientNonEnregistre: {
-              nom: "Balboa Felix",
-              contact: "0123456899",
-            },
-            articles: [
-              {
-                monture: montures.monture2,
-                quantite: 1,
-                prixUnitaire: 80,
-                remise: 0,
-              },
-              {
-                monture: montures.monture3,
-                quantite: 3,
-                prixUnitaire: 150,
-                remise: 20,
-              },
-            ],
-            montantTotal: 510, 
-            montantPaye: 510,
-            resteAPayer: 0,
-            dateVente: "2024-11-21",
-            statutPaiement: "payé",
-          });
-        }
-      }, 3000);
-    });
-  }
-  
-  
-  
-
-// #endregion
+import 'dayjs/locale/fr'
 
 
 const styles = StyleSheet.create({
@@ -221,6 +106,12 @@ const styles = StyleSheet.create({
   }
 });
 
+
+dayjs.extend(localizedFormat);
+dayjs.extend(updateLocale);
+dayjs.updateLocale("fr", null); 
+
+
 export default function Proformat(){
 
     const { id } = useParams();
@@ -307,7 +198,7 @@ export default function Proformat(){
                     </View>
                 </View>
             </View>
-            <Text style={{textAlign: 'center', marginLeft: 200, marginTop: 10}}>Yaoundé le, 11 Novembre 2024</Text>
+            <Text style={{textAlign: 'center', marginLeft: 200, marginTop: 10}}>{`Yaoundé le, ${dayjs().locale("fr").format("D MMMM YYYY")}`}</Text>
             <View style={{marginHorizontal: 75, marginTop: 10}}>
 
                 {/* Info du patient */}
@@ -317,7 +208,7 @@ export default function Proformat(){
                 <View style={{border: '2px solid black', marginTop: -1, width: 220}}>
                     <View style={{marginBottom: 15, flexDirection: 'row'}}>
                         <Text style={{width: 80}}>Patient</Text>
-                        <Text style={{flex: 1}}>{ `${client?.name  }${  client?.surname}`}</Text>
+                        <Text style={{flex: 1}}>{ `${client?.name?.toUpperCase()  }  ${  client?.surname?.toUpperCase() }`}</Text>
                     </View>
                     <View style={{marginBottom: 4, flexDirection: 'row'}}>
                         <Text style={{width: 80}}>Téléphone</Text>
@@ -377,8 +268,8 @@ export default function Proformat(){
                     </View>
                     <View style={{border: '2px solid black', marginTop: -1}}>
                         <View style={{borderBottom: '1px solid black', padding: '2 2 0 2'}}>
-                            <Text style={{fontWeight: 'bold', paddingBottom: 15}}>Montures</Text>
-                            {vente?.articles?.map(article => (
+                            {vente?.articles?.length && <Text style={{fontWeight: 'bold', paddingBottom: 15}}>Montures</Text>}
+                            { vente?.articles?.length &&  vente?.articles?.map(article => (
                                 <View style={{flexDirection: 'row', width: '100%', alignItems: 'center'}}>
                                 <View style={[styles.cellSpace,{width: '47%'}]}>
                                     <Text style={{marginBottom: 3}}>{article?.monture?.brand}</Text>
@@ -448,7 +339,7 @@ export default function Proformat(){
                         </View>
                     </View>
                 </View>
-                <Text style={{fontWeight: 'bold', marginTop: 20}}>Arreté cette proforma à la somme de cent cinq mille Franc CFA</Text>
+                <Text style={{fontWeight: 'bold', marginTop: 20}}>{`Arreté cette proforma à la somme de ${NumberToLetter(Number(vente?.montantTotal || 0))} Franc CFA`}</Text>
             </View>
             {/*
                 <Image 

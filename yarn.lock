@@ -2691,6 +2691,11 @@
   resolved "https://registry.yarnpkg.com/@leichtgewicht/ip-codec/-/ip-codec-2.0.4.tgz#b2ac626d6cb9c8718ab459166d4bb405b8ffa78b"
   integrity sha512-Hcv+nVC0kZnQ3tD9GVu5xSMR4VVYOteQIr/hwFPVEvPdlXqgGEuRjiheChHgdM+JyqdgNcmzZOX/tnl0JOiI7A==
 
+"@mandarvl/convertir-nombre-lettre@^1.0.5":
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/@mandarvl/convertir-nombre-lettre/-/convertir-nombre-lettre-1.0.5.tgz#201ee21ed5f3696b8778600e46fae0fbd492b706"
+  integrity sha512-BmvnTbopWNKkxgggkjWKX00+ylhsNSXESALsBrU4NiWfvKOEiHt/T01bDlUOA1V4chd4psjOU+3nuqRG5Tm5uQ==
+
 "@mui/private-theming@^5.15.14":
   version "5.15.14"
   resolved "https://registry.yarnpkg.com/@mui/private-theming/-/private-theming-5.15.14.tgz#edd9a82948ed01586a01c842eb89f0e3f68970ee"
@@ -5199,6 +5204,11 @@ date-fns@2.30.0:
   integrity sha512-fnULvOpxnC5/Vg3NCiWelDsLiUc9bRwAPs/+LfTLNvetFCtCTN+yQz15C/fs4AwX1R9K5GLtLfn8QW+dWisaAw==
   dependencies:
     "@babel/runtime" "^7.21.0"
+
+dayjs@^1.11.13:
+  version "1.11.13"
+  resolved "https://registry.yarnpkg.com/dayjs/-/dayjs-1.11.13.tgz#92430b0139055c3ebb60150aa13e860a4b5a366c"
+  integrity sha512-oaMBel6gjolK862uaPQOVTA7q3TZhuSvuMQAAglQDOWYO9A91IrAOUJEyKVlqJlHE0vq5p5UXxzdPfMH/x6xNg==
 
 debug@2.6.9, debug@^2.6.0:
   version "2.6.9"
