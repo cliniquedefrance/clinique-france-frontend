@@ -22,7 +22,7 @@ export const data = {
       {
         name: 'civilité',
         placeholder: 'votre civilité',
-        required: true,
+        required: false,
         type: 'picklist',
         id: 3,
         options: [
@@ -414,7 +414,7 @@ export const praticienCreateOrEdite = {
       {
         name: 'civility',
         placeholder: 'civilité',
-        required: true,
+        required: false,
         type: 'picklist',
         id: 3,
         options: [
@@ -639,7 +639,7 @@ export const userCreateOrEdite = {
       {
         name: 'civility',
         placeholder: 'civilité',
-        required: true,
+        required: false,
         type: 'picklist',
         id: 3,
         options: [
@@ -768,7 +768,7 @@ export const patientCreateOrEdite = {
       {
         name: 'civility',
         placeholder: 'civilité',
-        required: true,
+        required: false,
         type: 'picklist',
         id: 3,
         options: [

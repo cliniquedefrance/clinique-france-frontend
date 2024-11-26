@@ -181,7 +181,7 @@ function Ophtamology({ with: initialData, onSave, isOpen, loading, onClose, pati
               {/* Traitements */}
               <FormLabel>Traitements</FormLabel>
               <Stack direction="row" flexWrap="wrap" gap={3} columnGap={5} mb={4}>
-                {['Photochromique', 'Anti Reflet', 'Azur ou blue Protect', "Teintes A, B, AB"].map((traitement) => (
+                {['Photochromique', 'Anti Reflet', 'Azur', "Teintes A, B, AB", "blue Protect"].map((traitement) => (
                   <Checkbox
                     key={traitement}
                     readOnly={mode===VIEW_MODE}
