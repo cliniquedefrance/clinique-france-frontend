@@ -1,6 +1,6 @@
 /* eslint-disable consistent-return */
 import React, { createContext, useState, useEffect, useMemo, useCallback, useContext } from 'react';
-import { Alert, AlertDescription, AlertIcon, AlertTitle,  Button,   IconButton, Input, List, ListItem, Menu, MenuButton, MenuItem, MenuList, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Select, Spinner, Table, Tbody, Td, Text, Th, Thead, Tr} from '@chakra-ui/react';
+import { Alert, AlertDescription, AlertIcon, AlertTitle,  Box,  Button,   Flex,   IconButton, Input, List, ListItem, Menu, MenuButton, MenuItem, MenuList, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Select, Spinner, Table, Tbody, Td, Text, Th, Thead, Tr} from '@chakra-ui/react';
 import { LuRefreshCcw } from 'react-icons/lu';
 import { ChevronDownIcon } from '@chakra-ui/icons';
 
@@ -381,8 +381,8 @@ function VenteSearch() {
                       <Text fontWeight="bold">{monture.brand}</Text>
                       <Text fontSize="sm">{monture.model}</Text>
                     </Box>
-                    <Box>
-                      <Text fontWeight="bold">Quan</Text>
+                    <Box sx={{color: monture.quantity > 0 ? 'green.400': 'red.300'}}>
+                      <Text fontWeight="bold">Qté</Text>
                       <Text fontSize="xs" align="right">{monture.quantity}</Text>
                     </Box>
                   </Flex>
