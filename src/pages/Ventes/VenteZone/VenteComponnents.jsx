@@ -370,10 +370,22 @@ function VenteSearch() {
                   key={`${monture.brand}-${monture.model}`}
                   onClick={() => onSelect(monture)}
                   cursor="pointer"
+                  sx={{ 
+                  opacity: monture.quantity > 0 ? 1 : 0.5, 
+                  pointerEvents: monture.quantity > 0 ? "auto" : "none",
+                  }}
                   _hover={{ bg: 'gray.100' }}
                 >
-                  <Text fontWeight="bold">{monture.brand}</Text>
-                  <Text fontSize="sm">{monture.model}</Text>
+                  <Flex justify="space-between" >
+                    <Box>
+                      <Text fontWeight="bold">{monture.brand}</Text>
+                      <Text fontSize="sm">{monture.model}</Text>
+                    </Box>
+                    <Box>
+                      <Text fontWeight="bold">Quan</Text>
+                      <Text fontSize="xs" align="right">{monture.quantity}</Text>
+                    </Box>
+                  </Flex>
                 </ListItem>
               ))}
             </List>
