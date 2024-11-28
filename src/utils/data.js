@@ -801,14 +801,14 @@ export const patientCreateOrEdite = {
       {
         name: 'birthdate',
         placeholder: 'date de naissance',
-        required: true,
+        required: false,
         type: 'date',
         id: 4,
       },
       {
         name: 'telephone',
         placeholder: 'portable',
-        required: true,
+        required: false,
         type: 'number',
         id: 5,
       },
@@ -822,7 +822,7 @@ export const patientCreateOrEdite = {
       {
         name: 'password',
         placeholder: 'Mot de passe',
-        required: true,
+        required: false,
         type: 'password',
         id: 30,
       },
