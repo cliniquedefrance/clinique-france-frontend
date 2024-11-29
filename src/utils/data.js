@@ -815,7 +815,7 @@ export const patientCreateOrEdite = {
       {
         name: 'email',
         placeholder: 'email',
-        required: true,
+        required: false,
         type: 'email',
         id: 6,
       },
