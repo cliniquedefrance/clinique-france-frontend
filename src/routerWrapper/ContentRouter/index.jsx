@@ -19,6 +19,7 @@ import ConsigneRouter from './ConsigneRouter';
  import VerifyTokenPage from "../../pages/VerifyTokenPage"
 import CataloguePage from '../../pages/Catalogue';
 import VentePage from '../../pages/Ventes';
+import CashOperationPage from '../../pages/Caisse';
 // import LoginPage from '../../pages/LoginPage'
 
 function ContentRouter() {
@@ -86,6 +87,8 @@ function ContentRouter() {
         <Route path="/structure/*" element={<StructureRouter />} />
         <Route path="/catalogue/" element={<CataloguePage />} />
         <Route path="/ventes/" element={<VentePage />} />
+        <Route path="/caisse/" element={<CashOperationPage />} />
+
       </Routes>
     </> :
    isVerifyingToken && !isTokenValid && <VerifyTokenPage/>

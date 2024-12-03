@@ -60,6 +60,9 @@ export async function supprimerVente(venteId) {
     if (!response.ok) {
         throw new Error(`Erreur lors de la suppression de la vente: ${response.statusText}`);
     }
+
+    // eslint-disable-next-line eqeqeq
+    return response.status == 204;
 }
 
 /**

@@ -17,6 +17,7 @@ import {
   HStack
 } from '@chakra-ui/react';
 import { SearchMonture, SearchOrdonnance, VenteContext } from './VenteComponnents';
+import getConnectedUser from '../../../utils/user';
 
 function VenteForm({
   mode,
@@ -26,7 +27,9 @@ function VenteForm({
   onCreate,
   onUpdate,
   onClose,
+  isOnOtherPage=false,
 }) {
+  const [connectedUser, setConnectedUser] = useState(null);
 
   // Initialisation de formData selon le mode
   const [formData, setFormData] = useState({
@@ -38,7 +41,8 @@ function VenteForm({
     articles: [],
     montantTotal: 0,
     montantPaye: 0,
-    resteAPayer: 0
+    resteAPayer: 0,
+    user:null,
   });
 
   const {inOtherPage} = useContext(VenteContext)
@@ -74,9 +78,10 @@ function VenteForm({
         montantTotal: inFormVente.montantTotal || 0,
         montantPaye: inFormVente.montantPaye || 0,
         resteAPayer: inFormVente.resteAPayer || 0,
+        user: inFormVente?.user?._id || connectedUser._id || ""
       });
     }
-  }, [inFormVente, mode]);
+  }, [inFormVente, mode, connectedUser]);
 
 
   // Calculer les totaux et reste à payer automatiquement
@@ -92,6 +97,28 @@ function VenteForm({
     }));
   }, [formData.articles, formData.ordonnancePrixOD, formData.ordonnancePrixOG, formData.montantPaye]);
 
+
+  useEffect(() => {
+    const user = getConnectedUser()
+    if (user) {
+        setConnectedUser(user.user);
+        if(mode==="create" ){
+            setFormData(prev => ({
+                ...prev,
+                user:user.id,
+            }))
+        } 
+        if (mode==='update' && isOnOtherPage){
+          setFormData(prev => ({
+            ...prev,
+            user:user.id,
+        }))
+        }
+    } else {
+        setConnectedUser(null);
+    }
+
+}, [mode, inFormVente])
 
 
   // Gestion de la sélection d'une ordonnance
@@ -464,6 +491,7 @@ function VenteForm({
               {inFormProcess.success}
             </Alert>
           )}
+          <p><span>Utilisateur : </span> <span style={{fontWeight:"bold", fontStyle:'italic'}}>{connectedUser?.name}</span></p>
         </ModalBody>
 
         <ModalFooter>

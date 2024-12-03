@@ -24,7 +24,7 @@ import Ophtamology from '../../../components/Ordonances/Ophtamology';
 import { createOrdonnance, deleteOrdonnance, getAllOrdonnances, getOrdonnancesByPatient, updateOrdonnance } from './ordonnance.api';
 import OrdonnanceOphtaCard from '../../../components/Ordonances/OrdonnaceOphtaCard';
 import DeleteRessourceDialogue from '../../../components/Ressource/DeleteRessource';
-import { CREATE_MODE, ORDONNANCE_OPHTA_TO_PRINT, ORDONNANCE_RESSOURCE, UPDATE_MODE, VIEW_MODE } from './constants';
+import { CREATE_MODE, ORDONNANCE_RESSOURCE, UPDATE_MODE, VIEW_MODE } from './constants';
 import VenteForm from '../../Ventes/VenteZone/VenteForm';
 import { creerVente, obtenirToutesLesVentes } from '../../Ventes/vente.api';
 import { VenteList, VentePagination,  VenteZone } from '../../Ventes/VenteZone/VenteComponnents';
@@ -74,7 +74,8 @@ function ManagePatient() {
     inFormProcess : {error:"", loading:false, success:""},
     onCreate:() => null,
     onUpdate: ()=> null,
-    onClose : ()=>null
+    onClose : ()=>null,
+    isOnOtherPage: true,
   })
   const navigate = useNavigate();
   
@@ -110,11 +111,6 @@ function ManagePatient() {
   };
 
   const onPrint = (data) => {
-    const ordoData = {
-      ...data,
-      patient:patientToManage,
-    }
-    window.localStorage.setItem(ORDONNANCE_OPHTA_TO_PRINT, JSON.stringify(ordoData));
     navigate(`/print/ordonnance-ophta/${data._id}`)
     console.log("Ordonnance imprimée !");
   };
@@ -289,10 +285,10 @@ function ManagePatient() {
         if(createdVente){
           setInVenteFormProps(prev => ({
             ...prev,
-            inFormProcess: { error: null, success: "Vente crée avec succès", loading: true }
+            inFormProcess: { error: null, success: "Vente crée avec succès", loading: false }
           }))
           if(print===true){
-            window.alert(` Impression de la vente : ${ createdVente?._id} \n le service d'impression n'est pes encore implémenté. `)
+            navigate(`/print/vente-proforma/${createdVente._id}`);
           }
           setRefreshPatientVenteList(prev => !prev)
           onVenteFormClose()
@@ -301,14 +297,14 @@ function ManagePatient() {
 
           setInVenteFormProps(prev => ({
             ...prev,
-            inFormProcess: { error: null, success: "erreur lors de la création de la vente", loading: true }
+            inFormProcess: { success: null, error: "erreur lors de la création de la vente", loading: false },
           }))
         }
     
     } catch (error) {
       setInVenteFormProps(prev => ({
         ...prev,
-        inFormProcess: { error: null, success: "erreur lors de la création de la vente", loading: true }
+        inFormProcess: { success: null, error: "erreur lors de la création de la vente", loading: false }
       }))
     }
   

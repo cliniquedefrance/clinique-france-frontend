@@ -53,6 +53,7 @@ function* verifyTokenSagga({onLogin}){
         truth: true,
       });
       window.localStorage.setItem("connectedUser", JSON.stringify(result?.data?.theUser));
+      window.localStorage.setItem("connectedUserId", result?.data?.theUser?._id);
     }
   } catch (error) {
     yield put({

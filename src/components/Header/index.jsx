@@ -240,6 +240,9 @@ function NavigationBar() {
                   <Link to="/content/ventes">
                     <MenuItem>Ventes</MenuItem>
                   </Link>
+                  <Link to="/content/caisse">
+                    <MenuItem>Caisse</MenuItem>
+                  </Link>
                 </MenuList>
               </Menu>
             </Box>
