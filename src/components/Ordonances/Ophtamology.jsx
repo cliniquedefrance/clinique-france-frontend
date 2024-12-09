@@ -35,6 +35,7 @@ const formatDate = (date) => {
 function Ophtamology({ with: initialData, onSave, isOpen, loading, onClose, patient, onUpdate, mode, error, success, onPrint }) {
   const empty = {
     nom: patient?.name,
+    medecin: '',
     age: `${calculerAge(patient?.birthdate)} ans`,
     date: '',
     oeilDroit: { SPH: '', CYL: '', AXE: '', ADD: '', EP: '' },
@@ -158,6 +159,10 @@ function Ophtamology({ with: initialData, onSave, isOpen, loading, onClose, pati
                 <GridItem colSpan={2}>
                   <FormLabel>Date</FormLabel>
                   <Input readOnly={mode===VIEW_MODE} required type="date" name="date" value={formData.date} onChange={handleChange} />
+                </GridItem>
+                <GridItem colSpan={2}>
+                  <FormLabel>Médecin</FormLabel>
+                  <Input  name="medecin" value={formData.medecin} onChange={handleChange} />
                 </GridItem>
               </Grid>
 

@@ -116,6 +116,7 @@ function OrdonnanceOphtaPDF() {
             <Text>NOM ET PRENOM  : {`${patient?.name.toUpperCase()} ${patient?.surname.toUpperCase()}`}</Text>
             <Text>AGE  : {calculerAge(patient?.birthdate)} ans</Text>
             <Text>DATE: {new Date(ordonnance?.date).toLocaleDateString()}</Text>
+            <Text>MEDECIN : {`${ordonnance?.medecin?.toUpperCase()}`}</Text>
             <Text style={{ marginVertical: 10, textAlign: 'center', fontWeight: 'bold', fontSize: '23px' }}>Ordonnance de verre correcteur</Text>
           </View>
 

@@ -16,6 +16,24 @@ import Envelop from '../../../assets/images/envelop.png'
 import { obtenirVenteParId } from '../vente.api' // A utiliser lorsque les tests seront fonctionnel
 import 'dayjs/locale/fr'
 
+function formatDate(date) {
+  if (!date) return ""; // Si la date est null ou undefined
+  const parsedDate = new Date(date); // Convertir en objet Date
+  // eslint-disable-next-line no-restricted-globals
+  if (isNaN(parsedDate)) return "Date invalide"; // Gérer les cas où la date est invalide
+  const day = String(parsedDate.getDate()).padStart(2, '0');
+  const month = String(parsedDate.getMonth() + 1).padStart(2, '0'); // Les mois commencent à 0
+  const year = parsedDate.getFullYear();
+  return `${day}/${month}/${year}`;
+}
+
+function addOneYearMinusOneDay(date = new Date()) {
+  const newDate = new Date(date);
+  newDate.setFullYear(newDate.getFullYear() + 1); // Ajouter un an
+  newDate.setDate(newDate.getDate() - 1); // Soustraire un jour
+  return newDate;
+}
+
 
 const styles = StyleSheet.create({
   bigPage: {
@@ -203,12 +221,12 @@ export default function Proformat(){
 
                 {/* Info du patient */}
                 <Text style={{fontSize: 15, fontWeight: 'bold'}}>PROFORMA</Text>
-                <Text>FC00001-2024</Text>
+                <Text>{' '}</Text>
                 <Text style={{backgroundColor: 'black', padding: 4, width: 80, color: 'white'}}>Tiers Payant</Text>
                 <View style={{border: '2px solid black', marginTop: -1, width: 220}}>
                     <View style={{marginBottom: 15, flexDirection: 'row'}}>
                         <Text style={{width: 80}}>Patient</Text>
-                        <Text style={{flex: 1}}>{ `${client?.name?.toUpperCase()  }  ${  client?.surname?.toUpperCase() }`}</Text>
+                        <Text style={{flex: 1, fontWeight:"bolder",fontSize: 13, }}>{ `${client?.name?.toUpperCase()  }  ${  client?.surname?.toUpperCase() }`}</Text>
                     </View>
                     <View style={{marginBottom: 4, flexDirection: 'row'}}>
                         <Text style={{width: 80}}>Téléphone</Text>
@@ -216,11 +234,11 @@ export default function Proformat(){
                     </View>
                     <View style={{marginBottom: 4, flexDirection: 'row'}}>
                         <Text style={{width: 80}}>Médecin</Text>
-                        <Text style={{flex: 1}}>{ordonnance?.ophtamologue?.name || "N/A"}</Text>
+                        <Text style={{flex: 1}}>{ordonnance?.medecin || "N/A"}</Text>
                     </View>
                     <View style={{marginBottom: 4, flexDirection: 'row'}}>
                         <Text style={{width: 80}}>Date prescription</Text>
-                        <Text style={{flex: 1}}>{ordonnance?.createdAt}</Text>
+                        <Text style={{flex: 1}}>{dayjs(new Date(ordonnance?.date)).locale("fr").format("D MMMM YYYY")}</Text>
                     </View>
                 </View>
 
@@ -229,7 +247,7 @@ export default function Proformat(){
                 <View style={{border: '2px solid black', marginTop: -1, paddingRight: 40}}>
                     <View style={{flexDirection: 'row'}}>
                         <Text style={{width: 60, padding: 2}}>Docteur</Text>
-                        <Text style={{width: 125, padding: 2}}>{ordonnance?.ophtamologue?.name || "N/A"}</Text>
+                        <Text style={{width: 125, padding: 2}}>{ordonnance?.medecin|| "N/A"}</Text>
                         <Text style={styles.cell}>OEIL</Text>
                         <Text style={styles.cell}>Sphére</Text>
                         <Text style={styles.cell}>Cylindre</Text>
@@ -238,7 +256,7 @@ export default function Proformat(){
                     </View>
                     <View style={{flexDirection: 'row'}}>
                         <Text style={{width: 60, padding: 2}}>Rx date</Text>
-                        <Text style={{width: 125, padding: 2}}>08/11/2024</Text>
+                        <Text style={{width: 125, padding: 2}}>{formatDate(ordonnance?.date)}</Text>
                         <Text style={[styles.cell, {fontWeight: 'bold'}]}>OD</Text>
                         <Text style={styles.cell}>{ordonnance?.oeilDroit?.SPH}</Text>
                         <Text style={styles.cell}>{ordonnance?.oeilDroit?.CYL}</Text>
@@ -247,7 +265,7 @@ export default function Proformat(){
                     </View>
                     <View style={{flexDirection: 'row'}}>
                         <Text style={{width: 60, padding: 2}}>Rx Expired</Text>
-                        <Text style={{width: 125, padding: 2}}>07/11/2025</Text>
+                        <Text style={{width: 125, padding: 2}}>{formatDate(addOneYearMinusOneDay(ordonnance?.date))}</Text>
                         <Text style={styles.cell}>OG</Text>
                         <Text style={styles.cell}>{ordonnance?.oeilGauche?.SPH}</Text>
                         <Text style={styles.cell}>{ordonnance?.oeilGauche?.CYL}</Text>
@@ -284,12 +302,18 @@ export default function Proformat(){
                             </View>
                               ))}
                             
-                            <Text style={{fontWeight: 'bold', paddingVertical: 15}}>Verres</Text>
+                            <Text style={{fontWeight: 'bold', paddingVertical: 2}}>Verres</Text>
                             <View style={{flexDirection: 'row', width: '100%', alignItems: 'center'}}>
-                                <View style={[styles.cellSpace,{width: '47%'}]}>
-                                    <Text style={{marginBottom: 3}}><Text style={{fontWeight: 'bold'}}>OD: </Text>
+                                <View style={[styles.cellSpace,{width: '47%', paddingRight:10}]}>
+
+                                    <Text style={{marginBottom: 3}}><Text style={{fontWeight: 'bold', textDecoration:"underline"}}>Traitements: </Text><Text>{"\n"}</Text>
                                     {
-                                      ordonnance?.traitements?.map(traitement => (<Text>{traitement}</Text>))
+                                      ordonnance?.traitements?.map(traitement => (<Text>{traitement}<Text>{' '}</Text></Text>))
+                                    }
+                                    </Text>
+                                    <Text style={{marginBottom: 3}}><Text style={{fontWeight: 'bold',textDecoration:"underline"}}>Verre: </Text><Text>{"\n"}</Text>
+                                    {
+                                      ordonnance?.verre
                                     }
                                     </Text>
                                    
@@ -303,9 +327,14 @@ export default function Proformat(){
                             </View>
                             <View style={{flexDirection: 'row', width: '100%', alignItems: 'center'}}>
                                 <View style={[styles.cellSpace,{width: '47%'}]}>
-                                <Text style={{marginBottom: 3}}><Text style={{fontWeight: 'bold'}}>OG: </Text>
+                                  <Text style={{marginBottom: 3}}><Text style={{fontWeight: 'bold', textDecoration:"underline"}}>Matière: </Text><Text>{"\n"}</Text>
                                     {
-                                      ordonnance?.traitements?.map(traitement => (<Text>{traitement}</Text>))
+                                      ordonnance?.matiere
+                                    }
+                                    </Text>
+                                    <Text style={{marginBottom: 3}}><Text style={{fontWeight: 'bold', textDecoration:"underline"}}>Port: </Text><Text>{"\n"}</Text>
+                                    {
+                                      ordonnance?.port
                                     }
                                     </Text>
                                 </View>
