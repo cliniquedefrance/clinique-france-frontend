@@ -194,7 +194,7 @@ export default function Proformat(){
 
     return (
         <PDFViewer>
-      <Document title="Proforma-opht" author='Gateway force' >
+      <Document title="CLINIQUE FRANCE PROFORMA" author='Gateway force' >
         <Page size='A4' style={styles.bigPage} orientation="portrait">
           <View style={[styles.page, {opacity: 0.5, flexDirection: 'row', alignItems: 'center'}]}>
             {/* Background Image */}
@@ -327,7 +327,7 @@ export default function Proformat(){
                             </View>
                             <View style={{flexDirection: 'row', width: '100%', alignItems: 'center'}}>
                                 <View style={[styles.cellSpace,{width: '47%'}]}>
-                                  <Text style={{marginBottom: 3}}><Text style={{fontWeight: 'bold', textDecoration:"underline"}}>Matière: </Text><Text>{"\n"}</Text>
+                                  <Text style={{marginBottom: 3}}><Text style={{fontWeight:900, textDecoration:"underline"}}>Matière: </Text><Text>{"\n"}</Text>
                                     {
                                       ordonnance?.matiere
                                     }
