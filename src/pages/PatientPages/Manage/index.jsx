@@ -26,8 +26,8 @@ import OrdonnanceOphtaCard from '../../../components/Ordonances/OrdonnaceOphtaCa
 import DeleteRessourceDialogue from '../../../components/Ressource/DeleteRessource';
 import { CREATE_MODE, ORDONNANCE_RESSOURCE, UPDATE_MODE, VIEW_MODE } from './constants';
 import VenteForm from '../../Ventes/VenteZone/VenteForm';
-import { creerVente, obtenirToutesLesVentes } from '../../Ventes/vente.api';
-import { VenteList, VentePagination,  VenteZone } from '../../Ventes/VenteZone/VenteComponnents';
+import { creerVente, mettreAJourVente, obtenirToutesLesVentes, supprimerVente } from '../../Ventes/vente.api';
+import { VenteList, VentePagination,  VenteState,  VenteZone } from '../../Ventes/VenteZone/VenteComponnents';
 import { getAllMontures } from '../../Catalogue/Montures/monture.api';
 import VenteFilter from '../../Ventes/VenteZone/VenteFilter';
 
@@ -60,11 +60,14 @@ function ManagePatient() {
   const [patientToManage, setPatientToManage] = useState({});
   const [allOrdonnances, setAllOrdonnances] = useState([]);
   const [pageOrdoState, setPageOrdoState] = useState({error:"", loading:false, success:""});
-  const [confirmDel, setConfirmDel] = useState(false);
+  const [confirmDelOrdonnance, setConfirmDelOrdonnance] = useState(false);
+  const [confirmDelVente, setConfirmDelVente] = useState(false);
+  const [venteDeleteProcess, setVenteDeleteProcess] = useState({ error: null, success: null, loading: false });
   const [selectedOrdonnance, setSelectedOrdonnance] = useState(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState(VIEW_MODE);
-  const [toDelete, setToDelete] = useState({ type: "none", data: null });
+  const [venteToDel, setVenteToDel] = useState(null);
+  const [ordonnanceToDelete, setOrdonnanceToDelete] = useState({ type: "none", data: null });
   const [modalOrdoState, setModalOrdoState] = useState({error:"", loading:false, success:""});
   const [refreshPatientVenteList, setRefreshPatientVenteList] = useState(true);
   const [inVenteFormProps, setInVenteFormProps] = useState({
@@ -178,8 +181,8 @@ function ManagePatient() {
     setIsViewModalOpen(true);
   };
 
-  const hideModal = () => {
-    if([CREATE_MODE, UPDATE_MODE].includes(modalMode) || confirmDel){
+  const hideOrdonnanceModal = () => {
+    if([CREATE_MODE, UPDATE_MODE].includes(modalMode) || confirmDelOrdonnance){
       handleFetchAllOrdonnances();
     }
     setSelectedOrdonnance(null);
@@ -190,7 +193,7 @@ function ManagePatient() {
       success: ""
     }))
     setIsViewModalOpen(false);
-    setConfirmDel(false);
+    setConfirmDelOrdonnance(false);
   };
 
   const handleDeleteOrdonnance = (data) => {
@@ -199,8 +202,8 @@ function ManagePatient() {
       loading:false,
       error:""
     }));
-    setToDelete({ type: ORDONNANCE_RESSOURCE, data });
-    setConfirmDel(true);
+    setOrdonnanceToDelete({ type: ORDONNANCE_RESSOURCE, data });
+    setConfirmDelOrdonnance(true);
   };
 
   const onDelete = async () => {
@@ -210,8 +213,8 @@ function ManagePatient() {
       success:"",
     });
     try {
-      if (toDelete.type === ORDONNANCE_RESSOURCE) {
-        await deleteOrdonnance(toDelete.data._id);
+      if (ordonnanceToDelete.type === ORDONNANCE_RESSOURCE) {
+        await deleteOrdonnance(ordonnanceToDelete.data._id);
       }
       setPageOrdoState({
         error:"",
@@ -226,7 +229,7 @@ function ManagePatient() {
         success:"",
       });
     } finally {
-      hideModal();
+      hideOrdonnanceModal();
     }
   };
 
@@ -274,6 +277,8 @@ function ManagePatient() {
     onClose : ()=>null
   })
  }
+
+
 
   async function onSaveVente(vente,print=false){
     try {
@@ -332,6 +337,57 @@ function ManagePatient() {
  }))
  }
 
+ async function onUpdateVente(vente){
+  try {
+    setInVenteFormProps(prev => ({
+      ...prev,
+      inFormProcess: { error: null, success: null, loading: true }
+    }))
+    const updatedVente = await mettreAJourVente(inVenteFormProps.inFormVente?._id, vente);
+    if(updatedVente){
+      setInVenteFormProps(prev => ({
+        ...prev,
+        inFormProcess: { error: null, success: "Vente mise à jour avec succès", loading: true }
+      }))
+    }else{
+      setInVenteFormProps(prev => ({
+        ...prev,
+        inFormProcess: { error: "erreur lors de la mise à jour de la vente", success: null, loading: true }
+      }))
+    }
+} catch (error) {
+  setInVenteFormProps(prev => ({
+    ...prev,
+    inFormProcess: { error: "erreur lors de la mise à jour de la vente", success: null, loading: true }
+  }))
+
+}}
+
+ const handleUpdateVente = (vente) => {
+  setInVenteFormProps(prev => ({
+    ...prev,
+    showModal:true,
+    inFormVente: vente,
+    onUpdate: onUpdateVente,
+   }))
+}
+
+
+async function onDeleteVente(){
+  setConfirmDelVente(false)
+  try {// parade
+    setVenteDeleteProcess({ error: null, success: null, loading: true })
+    const deletedMonture = await supprimerVente(venteToDel._id);
+    if(deletedMonture){
+      setVenteDeleteProcess({ error: null, success: "Vente supprimé avec succès", loading: false })
+    }else{
+      setVenteDeleteProcess({ error: "erreur lors de la suppression de la Vente", success: null, loading: false })
+    }
+} catch (error) {
+  setVenteDeleteProcess({ error: error.message || "erreur lors de la suppression de la Vente", success: null, loading: false })
+}
+
+}
 
 
   useEffect(() => {
@@ -369,28 +425,28 @@ function ManagePatient() {
   const { name, civility, surname, telephone, email, photo } = patientToManage;
 
   const actions = [
-    // {
-    //     label: "modifier",
-    //     action: (vente)=> handleUpdateVente(vente)
+     {
+        label: "modifier",
+         action: (vente)=> handleUpdateVente(vente)
 
-    // },
-    // {
-    //     label: "Supprimer",
-    //     action: (vente)=> {
-    //       setVenteToDel(vente);
-    //       setConfirmDel(true)
-    //     }
+     },
+    {
+        label: "Supprimer",
+        action: (vente)=> {
+          setVenteToDel(vente);
+          setConfirmDelVente(true)
+        }
 
-    // },
+    },
     {
         label: "imprimer Proforma",
         action: (vente)=> navigate(`/print/vente-proforma/${vente._id}`),
 
     },
-    {
-      label:"Voir JSON",
-      action : (vente) => window.alert(JSON.stringify(vente, null, 2))
-    }
+    // {
+    //   label:"Voir JSON",
+    //   action : (vente) => window.alert(JSON.stringify(vente, null, 2))
+    // }
  ]
   return (
     <VenteZone api={api} inOtherPage>
@@ -405,14 +461,15 @@ function ManagePatient() {
         </VStack>
 
         <VStack backgroundColor="whitesmoke" flex={1} height="100%">
-          <Tabs isFitted variant="unstyled" width="100%">
+          <Tabs isFitted marginTop="4rem" marginBottom={1} variant="unstyled" width="100%">
             <TabList mb="1em" borderBottomColor="#2c3e50" borderBottomWidth="2px" borderTopColor="blue.500" borderTopWidth="2px">
               <Tab _selected={{ color: 'white', bg: "#2c3e50" }}>Détails du patient</Tab>
               <Tab _selected={{ color: 'white', bg: "#2c3e50" }}>Ordonnances</Tab>
               <Tab _selected={{ color: 'white', bg: "#2c3e50" }}>Statistiques</Tab>
             </TabList>
             <TabPanels>
-              <TabPanel overflow="auto" maxHeight={500}>
+              <TabPanel overflow="auto" paddingBottom={10} minHeight={700} maxHeight={700}>
+              <div style={{marginBottom: '50px'}}>
                 <TableContainer marginBottom={50}>
                   <Table variant="striped" size="sm">
                     <TableCaption placement="top">Détails du patient</TableCaption>
@@ -442,10 +499,13 @@ function ManagePatient() {
                   <Button w='250px' colorScheme="blue" onClick={() => navigate(`/content/patient/upsert/${id}`)}>Modifier</Button>
                   <Button w="250px" colorScheme="blue" onClick={() => navigate(`/content/patient/change-pwd/${id}`)}>Modifier le mot de passe</Button>
                 </HStack>
+              </div>
+                
               </TabPanel>
 
-              <TabPanel overflow="auto" maxHeight="100vh">
-              {pageOrdoState.error && !pageOrdoState.loading && (
+              <TabPanel overflow="auto" paddingBottom={10}   minHeight={700} maxHeight={700}>
+              <div style={{marginBottom: '50px'}}>
+                {pageOrdoState.error && !pageOrdoState.loading && (
               <Alert status="error" mb={4}>
                 <AlertIcon />
                 <AlertTitle>Erreur !</AlertTitle>
@@ -472,7 +532,7 @@ function ManagePatient() {
                   onUpdate={onUpdate}
                   onPrint={onPrint}
                   patient={patientToManage}
-                  onClose={hideModal}
+                  onClose={hideOrdonnanceModal}
                   isOpen={isViewModalOpen}
                   onSave={onCreateOrdonnance}
                   error={modalOrdoState.error}
@@ -496,27 +556,37 @@ function ManagePatient() {
                   
                
               ) : <p>Aucune ordonnance trouvée pour ce patient.</p>}
+              </div>
+              
               </TabPanel>
 
-              <TabPanel>
-              <Heading as="h2" mb={4}>
+              <TabPanel overflow="auto" paddingBottom={10}  minHeight={700} maxHeight={700}>
+              <div style={{marginBottom: '50px'}}>
+                    <Heading as="h2" mb={4}>
          Ventes du patient
       </Heading>
                 <VenteZone r={refreshPatientVenteList}  api={patientVenteApi}>
+                <VenteState process={venteDeleteProcess}  retryFunction={()=>onDeleteVente()} setProcess={setVenteDeleteProcess}/>
                   <VenteFilter showClientType={false}/>
                   <Divider mt={4} mb={4} />
-                  <VenteList actions={actions}/>
+                  
+                    <VenteList actions={actions}/>
+                 
+                  
                   <Divider mt={4} mb={4} />
                   <VentePagination/>
                 </VenteZone>
                 
+              </div>
+          
               </TabPanel>
             </TabPanels>
           </Tabs>
         </VStack>
       </HStack>
       <VenteForm {...inVenteFormProps} onClose={onVenteFormClose}/>
-      <DeleteRessourceDialogue title="suppression ordonnance"  open={confirmDel} onClose={hideModal} ressourceName={ORDONNANCE_RESSOURCE} onDelete={onDelete} />
+      <DeleteRessourceDialogue title="suppression ordonnance"  open={confirmDelOrdonnance} onClose={hideOrdonnanceModal} ressourceName={ORDONNANCE_RESSOURCE} onDelete={onDelete} />
+      <DeleteRessourceDialogue title="suppression Vente"  open={confirmDelVente} onClose={hideOrdonnanceModal} ressourceName={ORDONNANCE_RESSOURCE} onDelete={()=>onDeleteVente()} />
     </Flex>
     </VenteZone>
     

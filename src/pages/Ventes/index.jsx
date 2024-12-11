@@ -28,12 +28,12 @@ function VentePage() {
 
 const navigate = useNavigate()
 
-    const [confirmDel, setConfirmDel] = useState(false);
+    const [confirmVenteDel, setConfirmDel] = useState(false);
     const [venteToDel, setVenteToDel] = useState(null);
-    const [mode, setMode] = useState(CREATE_MODE);
+    const [venteMode, setMode] = useState(CREATE_MODE);
     const [inFormVente, setInFormVente] = useState(null);
     const [showVenteForm, setShowVenteForm] = useState();
-    const [inFormProcess, setInFormProcess] = useState({error:"", loading:false, success:""})
+    const [inVenteFormProcess, setInFormProcess] = useState({error:"", loading:false, success:""})
     const [venteDeleteProcess, setVenteDeleteProcess] = useState({ error: null, success: null, loading: false });
     const [refreshList, setRefreshList] = useState(false);
 
@@ -79,7 +79,7 @@ const navigate = useNavigate()
       }
     
       useEffect(()=>{
-        if(inFormProcess.success){
+        if(inVenteFormProcess.success){
           const test = setTimeout(()=> {
             setRefreshList(prev => !prev)
             setShowVenteForm(false)
@@ -101,7 +101,7 @@ const navigate = useNavigate()
             clearTimeout(testD)
         }, 2000)
     
-      }},[inFormProcess, venteDeleteProcess])
+      }},[inVenteFormProcess, venteDeleteProcess])
     
       async function onUpdateVente(vente){
         try {
@@ -191,9 +191,9 @@ const navigate = useNavigate()
         <Divider mt={4} mb={4} />
         <VentePagination />
        <VenteForm
-        inFormProcess={inFormProcess}
+        inFormProcess={inVenteFormProcess}
         inFormVente={inFormVente}
-        mode={mode}
+        mode={venteMode}
         showModal={showVenteForm}
         onCreate={onSaveVente}
         onUpdate={onUpdateVente}
@@ -202,7 +202,7 @@ const navigate = useNavigate()
         />
       </VenteZone>
      
-      <DeleteRessourceDialogue title="suppression Vente" onDelete={()=>onDeleteVente()}  open={confirmDel} onClose={hideDelConfirm} ressourceName="Vente"  />
+      <DeleteRessourceDialogue title="suppression Vente" onDelete={()=>onDeleteVente()}  open={confirmVenteDel} onClose={hideDelConfirm} ressourceName="Vente"  />
     </Box>
   );
 }
