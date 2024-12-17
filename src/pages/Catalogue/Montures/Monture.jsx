@@ -215,6 +215,7 @@ function MontureList() {
         <Tr>
           <Th>Marque</Th>
           <Th>Modèle</Th>
+          <Th>Genre</Th>
           <Th>Quantité</Th>
           <Th>Action</Th>
         </Tr>
@@ -224,6 +225,7 @@ function MontureList() {
           <Tr key={monture._id}>
             <Td>{highlightSearchTerm(monture.brand, searchTerm)}</Td>
             <Td>{highlightSearchTerm(monture.model, searchTerm)}</Td>
+            <Td >{monture?.genre}</Td>
             <Td >{monture?.quantity }</Td>
             <Td>
               <Menu>
