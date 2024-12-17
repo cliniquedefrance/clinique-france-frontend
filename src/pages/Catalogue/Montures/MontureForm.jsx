@@ -19,6 +19,7 @@ import {
   NumberInputStepper,
   NumberIncrementStepper,
   NumberDecrementStepper,
+  Select,
 } from '@chakra-ui/react';
 import { CREATE_MODE, UPDATE_MODE, VIEW_MODE } from './constants';
 
@@ -36,6 +37,7 @@ function MontureForm({
   const [formData, setFormData] = useState({
     brand: '',
     model: '',
+    genre: '',
     quantity: 1,
     isInStock: true
   });
@@ -45,6 +47,7 @@ function MontureForm({
       setFormData({
         brand: monture?.brand || '',
         model: monture?.model || '',
+        genre: monture?.genre || 'Homme',
         quantity: monture?.quantity || 1,
         isInStock: monture?.isInStock !== undefined ? monture.isInStock : true
       });
@@ -108,6 +111,13 @@ function MontureForm({
               placeholder="Ex: FT5178 - 52-18 - Noir/Doré"
               isDisabled={isViewMode}
             />
+          </FormControl>
+          <FormControl mt={4} >
+            <FormLabel>Genre</FormLabel>
+            <Select name='genre' value={formData.genre} onChange={handleChange}>
+            <option value='Homme'>Homme</option>
+            <option value='Femme'>Femme</option>
+            </Select>
           </FormControl>
           <FormControl mt={4}>
             <FormLabel>Quantité</FormLabel>
