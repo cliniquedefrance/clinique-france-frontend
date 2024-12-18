@@ -37,7 +37,7 @@ function MontureForm({
   const [formData, setFormData] = useState({
     brand: '',
     model: '',
-    genre: '',
+    genre: 'Homme',
     quantity: 1,
     isInStock: true
   });
