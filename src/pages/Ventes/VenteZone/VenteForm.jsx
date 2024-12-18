@@ -164,6 +164,15 @@ function VenteForm({
     setIsMontureModalOpen(false)
   };
 
+  const handleRemoveMonture = (articleToRemove) => {
+    const newArticles = formData.articles.filter(article => article.monture !== articleToRemove.monture);
+    setFormData((prev) => ({
+      ...prev,
+      articles: newArticles,
+    }));
+
+  };
+
 
   // Mise à jour des champs du formulaire
   const handleInputChange = (e) => {
@@ -446,6 +455,11 @@ function VenteForm({
                       </NumberInput>
                     </HStack>
                   </FormControl>
+                </HStack>
+                <HStack  width="full" alignItems="center" justifyContent="flex-end" padding={2}>
+                  <Button onClick={()=> handleRemoveMonture(article)} type='button'>
+                    Retirer cette monture
+                  </Button>
                 </HStack>
               </Box>
             );
